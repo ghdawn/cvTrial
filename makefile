@@ -32,20 +32,25 @@ Output = bin/
 
 # Uncomment these lines for some "safe" optimization flags
 
-CFLAGS = -O3 -pipe -fomit-frame-pointer -funroll-all-loops -s
+CFLAGS = -g -O1 -pipe -fomit-frame-pointer -funroll-all-loops -s 
 
-main: EasyBMP.o main.o
-	g++ $(CFLAGS) EasyBMP.o main.o -o $(Output)main
+objs = EasyBMP.o  ImageProcess.o main.o
+main: $(objs)
+	g++ $(CFLAGS) $(objs) -o $(Output)main
 	$(Output)main
-	
+
 EasyBMP.o: lib/bmp/EasyBMP.cpp lib/bmp/EasyBMP*.h
 	cp lib/bmp/EasyBMP*.h $(Output)
 	cp lib/bmp/EasyBMP.cpp $(Output)
 	g++ $(CFLAGS) -c $(Output)EasyBMP.cpp
 
+ImageProcess.o: inc/ImageProcess.h src/ImageProcess.cpp
+	cp inc/ImageProcess.h $(Output)
+	cp src/ImageProcess.cpp $(Output)
+	g++ $(CFLAGS) -c $(Output)ImageProcess.cpp
 main.o: main.cpp
 	cp main.cpp $(Output)
-	g++ -c $(Output)main.cpp
+	g++ $(CFLAGS) -c $(Output)main.cpp
 
 clean: 
 	rm -f *.o

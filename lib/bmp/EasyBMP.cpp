@@ -307,7 +307,7 @@ BMP::~BMP()
  { delete [] MetaData2; }
 } 
 
-RGBApixel* BMP::operator()(int i, int j)
+RGBApixel& BMP::operator()(int i, int j)
 {
  using namespace std;
  bool Warn = false;
@@ -325,7 +325,7 @@ RGBApixel* BMP::operator()(int i, int j)
        << "                 Truncating request to fit in the range [0,"
        << Width-1 << "] x [0," << Height-1 << "]." << endl;
  }	
- return &(Pixels[i][j]);
+ return (Pixels[i][j]);
 }
 
 // int BMP::TellBitDepth( void ) const
