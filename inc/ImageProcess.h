@@ -1,6 +1,8 @@
 #include "EasyBMP.h"
+#include "GrayBMP.h"
 
-void ConvertToGray(BMP &src,BMP &dst);
-void Dx(BMP &src,BMP &dx);
-void Dy(BMP &src,BMP &dx);
-void Sobel(BMP &src,BMP &dx);
+void ConvertToGray(BMP &src,GrayBMP &dst);
+void Dx(GrayBMP &src,GrayBMP &dx);
+void Dy(GrayBMP &src,GrayBMP &dx);
+void Sobel(GrayBMP &src,GrayBMP &dx);
+void WriteToFile(GrayBMP &src,char* filename);
