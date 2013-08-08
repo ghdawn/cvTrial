@@ -3,8 +3,33 @@
 #include "ImageProcess.h"
 #include "GrayBMP.h"
 #include "Util.cpp"
+#include "Filter.h"
+#include "Vector.h"
 using namespace std;
 
+void printVec(Vector<Byte> &v)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		printf("%d ", v[i]);
+	}
+	printf("\n");
+}
+void testVector()
+{
+	Vector<Byte> v(10);
+	for (int i = 0; i < 10; ++i)
+	{
+		v[i]=1;
+	}
+	printVec(v);
+	Vector<Byte> b;
+	b=v;
+    printVec(b);
+	printf("%d %d\n", v*b,b*v);
+	printVec(v);
+	printVec(b);
+}
 void testDiff()
 {
 	BMP Input;
@@ -14,11 +39,16 @@ void testDiff()
 	ConvertToGray(Input,gray);
 	WriteToFile(gray,"gray.bmp");
 	GrayBMP test(gray);
-	Dx(gray,test);
+	GrayBMP gaussian(gray);
+	// Filter_Median(gray,test,5);
+	// WriteToFile(test,"Filter_Median.bmp");
+	Filter_Gaussian(gray,gaussian,7,1.5);
+	WriteToFile(gaussian,"Filter_Gaussian.bmp");
+	Dx(gaussian,test);
 	WriteToFile(test,"dx.bmp");
-	Dy(gray,test);
+	Dy(gaussian,test);
 	WriteToFile(test,"Dy.bmp");
-	Sobel(gray,test);
+	Sobel(gaussian,test);
 	WriteToFile(test,"Sobel.bmp");
 }
 
@@ -41,7 +71,8 @@ void testGaussian()
 }
 int main()
 {
-	testGaussian();
+	// testVector();
+	// testGaussian();
 	testDiff();
 	return 0;
 }

@@ -14,13 +14,30 @@ void SetCanWarningOn( void )
 bool GetCanWarningtate( void )
 { return CanWarning; }
 
-int GrayBMP::TellWidth()
+int GrayBMP::TellWidth() const
 {
 	return Width;
 }
-int GrayBMP::TellHeight()
+int GrayBMP::TellHeight() const
 {
 	return Height;
+}
+Vector<float> GrayBMP::GetSquare(int x,int y,int Range)
+{
+	// printf("(%d,%d)\n", x,y);
+	Vector<float> vec(Range*Range);
+	int k=0;
+	Range/=2;
+	for (int i = x-Range; i <= x+Range; ++i)
+	{
+		for(int j = y-Range; j<= y+Range; ++j)
+		{
+			vec[k++]=data[i][j];
+			// printf("%d ",data[i][j] );
+		}
+		// printf("\n");
+	}
+	return vec;
 }
 Byte& GrayBMP::operator()(int i,int j)
 {
@@ -40,7 +57,26 @@ Byte& GrayBMP::operator()(int i,int j)
 	}	
 	return (data[i][j]);
 }
-GrayBMP GrayBMP::operator=(GrayBMP& Input)
+
+Byte GrayBMP::operator()(int i,int j) const
+{
+	bool Warn = false;
+	if( i >= Width )
+		{  Warn = true; }
+	if( i < 0 )
+		{  Warn = true; }
+	if( j >= Height )
+		{  Warn = true; }
+	if( j < 0 )
+		{  Warn = true; }
+	if( Warn && CanWarning )
+	{
+		printf( "Warning: Attempted to access non-existent pixel:(%d,%d)\n",i,j);
+		return data[0][0];
+	}	
+	return (data[i][j]);
+}
+GrayBMP GrayBMP::operator=(const GrayBMP& Input)
 {
 	Width=Input.TellWidth();
 	Height=Input.TellHeight();
@@ -73,6 +109,7 @@ GrayBMP::GrayBMP()
 }
 GrayBMP::GrayBMP( GrayBMP& Input )
 {
+	data=NULL;
 	SetSize(Input.TellWidth(),Input.TellHeight());
 	for (int i = 0; i < Width; ++i)
 	{

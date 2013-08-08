@@ -15,6 +15,15 @@ namespace Math
 		return exp(-(Square(i)+Square(j))/(2*Var*Var))/(2*PI*Var*Var);
 	}
 
+	inline bool OutOfRange(int x,int Range, int Low, int High)
+	{
+		Range/=2;
+		if (((x+Range)>High) || ((x-Range)<Low))
+		{
+			return true;
+		}
+		return false;
+	}
 	
 }
 #endif

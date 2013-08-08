@@ -1,5 +1,6 @@
 #include "ImageProcess.h"
-#include "math.h"
+#include "Util.cpp"
+
 
 void ConvertToGray(BMP &src,GrayBMP &dst)
 {
@@ -16,7 +17,7 @@ void ConvertToGray(BMP &src,GrayBMP &dst)
 	}
 }
 
-void WriteToFile(GrayBMP &src,char* filename)
+void WriteToFile(GrayBMP &src,const char* filename)
 {
 	BMP temp;
 	temp.SetSize(src.TellWidth(),src.TellHeight());
@@ -69,7 +70,7 @@ void Dy(GrayBMP &src,GrayBMP &dy)
 			}
 			else
 			{
-				Byte TempBYTE=(src(i-1,j+1)-src(i-1,j-1))+2*(src(i,j+1)-src(i,j-1))+(src(i+1,j+1)-src(i+1,j-1));
+				Byte TempBYTE=(src(i-1,j-1)-src(i-1,j+1))+2*(src(i,j-1)-src(i,j+1))+(src(i+1,j-1)-src(i+1,j+1));
 				dy(i,j) = TempBYTE;
 				
 			}
@@ -88,7 +89,7 @@ void Sobel(GrayBMP &src,GrayBMP &result)
 	{
 		for (int j = 0; j < src.TellHeight(); ++j)
 		{
-			Byte TempBYTE=sqrt(Square(dx(i,j))+Square(dy(i,j)));
+			Byte TempBYTE=(Byte)sqrt(Math::SquareInt(dx(i,j))+Math::SquareInt(dy(i,j)));
 			result(i,j) = TempBYTE;
 			
 		}
