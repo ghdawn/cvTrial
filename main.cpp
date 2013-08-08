@@ -1,37 +1,37 @@
 #include <iostream>
 #include "EasyBMP.h"
 #include "ImageProcess.h"
-
+#include "GrayBMP.h"
+#include "Util.cpp"
 using namespace std;
 
 void testDiff()
 {
-	BMP test,gray;
-	test.ReadFromFile("img/table1.bmp");
-	gray.SetSize(test.TellWidth(),test.TellHeight());
-	gray.SetBitDepth(8);
-	ConvertToGray(test,gray);
-	test.SetBitDepth(8);
-	CreateGrayscaleColorTable( test );
+	BMP Input;
+	GrayBMP gray;
+	Input.ReadFromFile("img/table1.bmp");
+	gray.SetSize(Input.TellWidth(),Input.TellHeight());
+	ConvertToGray(Input,gray);
+	WriteToFile(gray,"gray.bmp");
+	GrayBMP test(gray);
 	Dx(gray,test);
-	test.WriteToFile("dx.bmp");
+	WriteToFile(test,"dx.bmp");
 	Dy(gray,test);
-	test.WriteToFile("Dy.bmp");
+	WriteToFile(test,"Dy.bmp");
 	Sobel(gray,test);
-	test.WriteToFile("Sobel.bmp");
-
+	WriteToFile(test,"Sobel.bmp");
 }
 
 void testGaussian()
 {
-	const double pi=3.1415926;
+	
 	double a[5][5];
 	double var=1;
 	for (int i = 0; i < 5; ++i)
 	{
 		for(int j=0; j < 5; ++j)
 		{
-			a[i][j]=exp(-(Square(i-2)+Square(j-2))/(2*var*var))/(2*pi*var*var);
+			a[i][j]=Math::Gaussian(i-2,j-2,var);
 			printf("%lf  ",a[i][j] );
 		}
 		printf("\n");
@@ -42,6 +42,6 @@ void testGaussian()
 int main()
 {
 	testGaussian();
-	
+	testDiff();
 	return 0;
 }
