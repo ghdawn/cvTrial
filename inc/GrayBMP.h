@@ -2,7 +2,7 @@
 #define _Gray_BMP_h_
 
 #include "Vector.h"
-typedef unsigned char Byte;
+
 extern bool CanWarning;
 void SetCanWarningOff( void );
 void SetCanWarningOn( void );
@@ -13,17 +13,21 @@ class GrayBMP
 private:
 	int Width;
 	int Height;
-	Byte** data;
+	int** data;
 public:
 	void Dispose();
 	int TellWidth() const;
 	int TellHeight() const;
 	Vector<float> GetSquare(int i,int j,int Range);
-	Byte& operator()(int i,int j);
-	Byte operator()(int i,int j) const;
-	GrayBMP operator=(const GrayBMP& Input);
 	void SetSize(int,int);
+
+	//Operator
+	int& operator()(int i,int j);
+	int operator()(int i,int j) const;
+	GrayBMP& operator=(const GrayBMP& Input);
+	GrayBMP operator-(const GrayBMP& Input);
 	GrayBMP();
+	GrayBMP(int width,int height);
 	GrayBMP( GrayBMP& Input );
  	~GrayBMP();
 };

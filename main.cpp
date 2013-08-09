@@ -5,6 +5,7 @@
 #include "Util.cpp"
 #include "Filter.h"
 #include "Vector.h"
+#include "Matrix.h"
 using namespace std;
 
 void printVec(Vector<Byte> &v)
@@ -12,6 +13,15 @@ void printVec(Vector<Byte> &v)
 	for (int i = 0; i < 10; ++i)
 	{
 		printf("%d ", v[i]);
+	}
+	printf("\n");
+}
+
+void printVec(Vector<float> &v)
+{
+	for (int i = 0; i < v.dim(); ++i)
+	{
+		printf("%f ", v[i]);
 	}
 	printf("\n");
 }
@@ -30,6 +40,20 @@ void testVector()
 	printVec(v);
 	printVec(b);
 }
+
+void printBMP(const GrayBMP& test)
+{
+	for (int i = 0; i < 20; ++i)
+	{
+		for (int j = 0; j < 20; ++j)
+		{
+			printf("%3d ", test(i,j));
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
 void testDiff()
 {
 	BMP Input;
@@ -40,17 +64,23 @@ void testDiff()
 	WriteToFile(gray,"gray.bmp");
 	GrayBMP test(gray);
 	GrayBMP gaussian(gray);
-	// Filter_Median(gray,test,5);
-	// WriteToFile(test,"Filter_Median.bmp");
-	Filter_Gaussian(gray,gaussian,7,1.5);
+
+	//printBMP(gray);
+	Filter_Gaussian(gray,gaussian,3,1.5);
 	WriteToFile(gaussian,"Filter_Gaussian.bmp");
 	Dx(gaussian,test);
+	//printBMP(test);
 	WriteToFile(test,"dx.bmp");
+
 	Dy(gaussian,test);
+	//printBMP(test);
 	WriteToFile(test,"Dy.bmp");
+
 	Sobel(gaussian,test);
+	//printBMP(test);
 	WriteToFile(test,"Sobel.bmp");
 }
+
 
 void testGaussian()
 {
@@ -66,13 +96,33 @@ void testGaussian()
 		}
 		printf("\n");
 	}
+}
 
+void testOpticalFlow()
+{
 
+}
+
+void testMatrix()
+{
+	float data[]={1,1,1,-1};
+	Matrix<float> mat(2,2,data);
+	mat.printMatrix();
+	Matrix<float> mat2=mat.inv();
+	mat2.printMatrix();
+	Vector<float> result(2),b(2);
+	b[0]=2;
+	b[1]=1;
+	result=mat2*b;
+	printVec(result);
 }
 int main()
 {
+	testMatrix();
 	// testVector();
 	// testGaussian();
-	testDiff();
+	// testDiff();
+	// testOpticalFlow();
+
 	return 0;
 }

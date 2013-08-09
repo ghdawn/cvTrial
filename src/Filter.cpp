@@ -18,8 +18,8 @@ void Filter_Gaussian(GrayBMP &src,GrayBMP &dst, int Range, float Var)
 	{
 		for (int j = 0; j < src.TellHeight(); ++j)
 		{
-			if (Math::OutOfRange(i,Range,0,src.TellWidth()-1) ||
-				Math::OutOfRange(j,Range,0,src.TellHeight()-1))
+			if (Limit::OutOfRange(i,Range,0,src.TellWidth()-1) ||
+				Limit::OutOfRange(j,Range,0,src.TellHeight()-1))
 			{
 				dst(i,j)=src(i,j);
 			}
@@ -39,8 +39,8 @@ void Filter_Median(GrayBMP &src,GrayBMP &dst, int Range)
 	{
 		for (int j = 0; j < src.TellHeight(); ++j)
 		{
-			if (Math::OutOfRange(i,Range,0,src.TellWidth()-1) ||
-				Math::OutOfRange(j,Range,0,src.TellHeight()-1))
+			if (Limit::OutOfRange(i,Range,0,src.TellWidth()-1) ||
+				Limit::OutOfRange(j,Range,0,src.TellHeight()-1))
 			{
 				dst(i,j)=src(i,j);
 			}

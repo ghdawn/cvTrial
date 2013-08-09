@@ -49,8 +49,9 @@ void Dx(GrayBMP &src,GrayBMP &dx)
 			}
 			else
 			{
-				Byte TempBYTE=(src(i+1,j-1)-src(i-1,j-1))+2*(src(i+1,j)-src(i-1,j))+(src(i+1,j+1)-src(i-1,j+1));
-				dx(i,j) = TempBYTE;
+				int TempBYTE=(src(i+1,j-1)-src(i-1,j-1))+2*(src(i+1,j)-src(i-1,j))+(src(i+1,j+1)-src(i-1,j+1));
+				// int TempBYTE=(src(i+1,j-1)+2*src(i+1,j)+src(i+1,j+1)+(-1)*src(i-1,j-1)+(-2)*src(i-1,j)+(-1)*src(i-1,j+1));
+				dx(i,j) = Limit::GrayByte(TempBYTE);
 				
 			}
 		}
@@ -70,8 +71,8 @@ void Dy(GrayBMP &src,GrayBMP &dy)
 			}
 			else
 			{
-				Byte TempBYTE=(src(i-1,j-1)-src(i-1,j+1))+2*(src(i,j-1)-src(i,j+1))+(src(i+1,j-1)-src(i+1,j+1));
-				dy(i,j) = TempBYTE;
+				int TempBYTE=(src(i-1,j-1)-src(i-1,j+1))+2*(src(i,j-1)-src(i,j+1))+(src(i+1,j-1)-src(i+1,j+1));
+				dy(i,j) =  Limit::GrayByte(TempBYTE);
 				
 			}
 		}
@@ -89,8 +90,9 @@ void Sobel(GrayBMP &src,GrayBMP &result)
 	{
 		for (int j = 0; j < src.TellHeight(); ++j)
 		{
-			Byte TempBYTE=(Byte)sqrt(Math::SquareInt(dx(i,j))+Math::SquareInt(dy(i,j)));
-			result(i,j) = TempBYTE;
+			// int TempBYTE=(int)sqrt(Math::Square(dx(i,j))+Math::Square(dy(i,j)));
+			int TempBYTE=(int)(Math::Abs(dx(i,j))+Math::Abs(dy(i,j)));
+			result(i,j) =  Limit::GrayByte(TempBYTE);
 			
 		}
 	}

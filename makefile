@@ -36,7 +36,8 @@ ImageProcess.o: inc/ImageProcess.h src/ImageProcess.cpp
 	cp src/ImageProcess.cpp $(Output)
 	$(CC) $(CFLAGS) -c $(Output)ImageProcess.cpp
 
-main.o: main.cpp inc/Vector.h
+main.o: main.cpp inc/Vector.h inc/Matrix.h
+	cp inc/*.h $(Output)
 	cp main.cpp $(Output)
 	$(CC) $(CFLAGS) -c $(Output)main.cpp
 

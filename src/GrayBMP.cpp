@@ -1,18 +1,6 @@
 #include "GrayBMP.h"
 #include "stdio.h"
-#include "string.h"
-
-#ifndef _Can_Give_Warning_
-#define _Can_Give_Warning_
-bool CanWarning=true;
-#endif
-
-void SetCanWarningOff( void )
-{ CanWarning = false; }
-void SetCanWarningOn( void )
-{ CanWarning = true; }
-bool GetCanWarningtate( void )
-{ return CanWarning; }
+#include "Util.cpp"
 
 int GrayBMP::TellWidth() const
 {
@@ -39,7 +27,7 @@ Vector<float> GrayBMP::GetSquare(int x,int y,int Range)
 	}
 	return vec;
 }
-Byte& GrayBMP::operator()(int i,int j)
+int& GrayBMP::operator()(int i,int j)
 {
 	bool Warn = false;
 	if( i >= Width )
@@ -50,7 +38,7 @@ Byte& GrayBMP::operator()(int i,int j)
 		{  Warn = true; }
 	if( j < 0 )
 		{  Warn = true; }
-	if( Warn && CanWarning )
+	if( Warn )
 	{
 		printf( "Warning: Attempted to access non-existent pixel:(%d,%d)\n",i,j);
 		return data[0][0];
@@ -58,7 +46,7 @@ Byte& GrayBMP::operator()(int i,int j)
 	return (data[i][j]);
 }
 
-Byte GrayBMP::operator()(int i,int j) const
+int GrayBMP::operator()(int i,int j) const
 {
 	bool Warn = false;
 	if( i >= Width )
@@ -69,17 +57,16 @@ Byte GrayBMP::operator()(int i,int j) const
 		{  Warn = true; }
 	if( j < 0 )
 		{  Warn = true; }
-	if( Warn && CanWarning )
+	if( Warn )
 	{
 		printf( "Warning: Attempted to access non-existent pixel:(%d,%d)\n",i,j);
 		return data[0][0];
 	}	
 	return (data[i][j]);
 }
-GrayBMP GrayBMP::operator=(const GrayBMP& Input)
+GrayBMP& GrayBMP::operator=(const GrayBMP& Input)
 {
-	Width=Input.TellWidth();
-	Height=Input.TellHeight();
+	SetSize(Input.TellWidth(),Input.TellHeight());
 	for (int i = 0; i < Width; ++i)
 	{
 		for (int j = 0; j < Height; ++j)
@@ -87,25 +74,43 @@ GrayBMP GrayBMP::operator=(const GrayBMP& Input)
 			data[i][j]=Input(i,j);
 		}
 	}
+	return *this;
 }
 
+GrayBMP GrayBMP::operator-(const GrayBMP& Input)
+{
+	GrayBMP result(Input.TellWidth(),Input.TellHeight());
+	for (int i = 0; i < Width; ++i)
+	{
+		for (int j = 0; j < Height; ++j)
+		{
+			result(i,j)=Limit::GrayByte(data[i][j]-Input(i,j));
+		}
+	}
+	return result;
+}
 void GrayBMP::SetSize(int newWidth, int newHeight)
 {
 	Dispose();
 	Width = newWidth;
 	Height = newHeight;
-	data = new Byte* [ Width ]; 
+	data = new int* [ Width ]; 
 
 	for(int i=0; i<Width; i++)
-		{ data[i] = new Byte [ Height ]; }
+		{ data[i] = new int [ Height ]; }
 }
 
 GrayBMP::GrayBMP()
 {
 	Width = 1;
 	Height = 1;
-	data = new Byte* [ Width ]; 
-	data[0]=new Byte[Height];
+	data = new int* [ Width ]; 
+	data[0]=new int[Height];
+}
+
+GrayBMP::GrayBMP(int width,int height)
+{
+	SetSize(width,height);
 }
 GrayBMP::GrayBMP( GrayBMP& Input )
 {
