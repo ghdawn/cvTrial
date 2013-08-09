@@ -27,6 +27,12 @@ Vector<float> GrayBMP::GetSquare(int x,int y,int Range)
 	}
 	return vec;
 }
+
+bool GrayBMP::MatchSize(int width ,int height)
+{
+	return (width==Width)&&(height==Height);
+}
+
 int& GrayBMP::operator()(int i,int j)
 {
 	bool Warn = false;
@@ -110,6 +116,7 @@ GrayBMP::GrayBMP()
 
 GrayBMP::GrayBMP(int width,int height)
 {
+	data=NULL;
 	SetSize(width,height);
 }
 GrayBMP::GrayBMP( GrayBMP& Input )

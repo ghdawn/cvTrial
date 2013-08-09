@@ -20,7 +20,7 @@ public:
 	int TellHeight() const;
 	Vector<float> GetSquare(int i,int j,int Range);
 	void SetSize(int,int);
-
+	bool MatchSize(int ,int );
 	//Operator
 	int& operator()(int i,int j);
 	int operator()(int i,int j) const;

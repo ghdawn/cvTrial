@@ -4,7 +4,7 @@ Output = bin/
 
 CFLAGS = -g
 
-objs =GrayBMP.o EasyBMP.o Util.o Filter.o ImageProcess.o main.o
+objs =Util.o GrayBMP.o EasyBMP.o  Filter.o ImageProcess.o main.o
 
 
 main: $(objs)

@@ -41,7 +41,7 @@ namespace Limit
 	{ 
 		if (a<0)
 		{
-			return Math::Abs(a);
+			return (Byte)Math::Abs(a);
 		}
 		if(a>255)
 		{

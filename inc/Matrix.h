@@ -323,7 +323,7 @@ Matrix<float> Matrix<T>::inv() const
 	mat(0,1)=-b;
 	mat(1,0)=-c;
 	mat(1,1)=a;
-	mat*=1.0/(a*d-b*c);
+	mat*=(1.0f/(a*d-b*c));
 	return mat;
 }
 template<class T>

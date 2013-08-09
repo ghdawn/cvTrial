@@ -4,9 +4,11 @@
 
 #include "vector"
 #include "algorithm"
-#include "stdio.h"
 #include "string.h"
-using std::vector;
+#include "iostream"
+#include "cstdio"
+#include "Util.cpp"
+using namespace std;
 
 template<typename T>
 class Vector
@@ -29,7 +31,7 @@ public:
 	void loadData(int dim,T* data);
 	void reset();
 	inline void Sort(){std::sort(data,data+_dim);}
-
+	void printVec();
 	//Operator
 	T operator*(const Vector<T> &vec) const;
 	Vector<T> operator*(float k);
@@ -40,6 +42,7 @@ public:
 	Vector<T>& operator=(const Vector& vec);
 
 	//Calc
+	Vector<T> dotProduct(const Vector<T> &vec) const;
 	T norm1() const;
 	float norm2() const;
 	T sum() const;
@@ -138,6 +141,15 @@ void Vector<T>::reset()
     	data[i]=0;
     }
 }
+template<typename T>
+void Vector<T>::printVec()
+{
+	for (int i = 0; i < _dim; ++i)
+	{
+		cout<<data[i]<<' ';
+	}
+	cout<<endl;
+}
 
 template<typename T>
 T Vector<T>::operator*(const Vector<T> &vec) const
@@ -160,11 +172,12 @@ T Vector<T>::operator*(const Vector<T> &vec) const
 template<typename T>
 Vector<T> Vector<T>::operator*(float k)
 {
+	Vector<T> result(_dim);
 	for (int i = 0; i < _dim; ++i)
 	{
-		data[i]=T(data[i]*k);
+		result[i]=T(data[i]*k);
 	}
-	return *this;
+	return result;
 }
 
 template<typename T>
@@ -208,5 +221,47 @@ Vector<T>& Vector<T>::operator=(const Vector& vec)
 		//printf("%d:(%d->%d)\n", i,vec[i],this->data[i]);
 	}
 	return *this;
+}
+
+	//Calc
+template<typename T>
+Vector<T> Vector<T>::dotProduct(const Vector<T> &vec) const
+{
+	Vector<T> result(vec.dim());
+	for (int i = 0; i < _dim; ++i)
+	{
+		result[i]=data[i]*vec[i];
+	}
+	return result;
+}
+template<typename T>
+T Vector<T>::norm1() const
+{
+	T ans=0;
+	for (int i = 0; i < _dim; ++i)
+	{
+		ans+=Math::Abs(data[i]);
+	}
+	return ans;
+}
+template<typename T>
+float Vector<T>::norm2() const
+{
+	T ans=0;
+	for (int i = 0; i < _dim; ++i)
+	{
+		ans+=data[i]*data[i];
+	}
+	return sqrt(ans);
+}
+template<typename T>
+T Vector<T>::sum() const
+{
+	T ans=0;
+	for (int i = 0; i < _dim; ++i)
+	{
+		ans+=data[i];
+	}
+	return ans;
 }
 #endif
