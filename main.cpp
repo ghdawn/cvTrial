@@ -159,10 +159,10 @@ void testOpticalFlow()
 				b[0]=Ix.dotProduct(gaussian)*It*(-1);
 				b[1]=Iy.dotProduct(gaussian)*It*(-1);
 
-				r=mat.inv()*b;
+				r=mat.inv()*b*40;
 				
 				gray2(i,j)=Limit::GrayByte(r.norm2());
-			#define Debug
+			// #define Debug
 			#ifdef Debug
 			Ix.printVec();
 			Iy.printVec();
