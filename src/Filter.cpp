@@ -1,6 +1,7 @@
 #include "Filter.h"
 #include "Util.cpp"
 #include "Vector.h"
+#include "GrayBMP.h"
 
 void Filter_Gaussian(GrayBMP &src,GrayBMP &dst, int Range, float Var)
 {
@@ -14,6 +15,7 @@ void Filter_Gaussian(GrayBMP &src,GrayBMP &dst, int Range, float Var)
 			gaussian[k++]=Math::Gaussian(i-mid,j-mid,Var);
 		}
 	}
+	float w=1/gaussian.sum();
 	for (int i = 0; i < src.TellWidth(); ++i)
 	{
 		for (int j = 0; j < src.TellHeight(); ++j)
@@ -27,7 +29,7 @@ void Filter_Gaussian(GrayBMP &src,GrayBMP &dst, int Range, float Var)
 			{
 				Vector<float> origin;
 				origin=src.GetSquare(i,j,Range);
-				dst(i,j)=(Byte)(origin*gaussian);
+				dst(i,j)=(Byte)(origin*gaussian*w);
 			}
 		}
 	}	

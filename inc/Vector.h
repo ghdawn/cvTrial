@@ -2,7 +2,6 @@
 #ifndef __Vector_H_
 #define __Vector_H_
 
-#include "vector"
 #include "algorithm"
 #include "string.h"
 #include "iostream"

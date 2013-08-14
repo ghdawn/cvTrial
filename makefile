@@ -4,7 +4,7 @@ Output = bin/
 
 CFLAGS = -g
 
-objs =Util.o GrayBMP.o EasyBMP.o  Filter.o ImageProcess.o main.o
+objs =Util.o GrayBMP.o Draw.o  EasyBMP.o  Filter.o ImageProcess.o main.o
 
 
 main: $(objs)
@@ -19,6 +19,11 @@ Filter.o: inc/Filter.h src/Filter.cpp inc/Vector.h
 Util.o: src/Util.cpp
 	cp src/Util.cpp $(Output)
 	$(CC) $(CFLAGS) -c $(Output)Util.cpp
+	
+Draw.o: src/Draw.cpp inc/Draw.h
+	cp inc/Draw.h $(Output)
+	cp src/Draw.cpp $(Output)
+	$(CC) $(CFLAGS) -c $(Output)Draw.cpp
 	
 GrayBMP.o: inc/GrayBMP.h src/GrayBMP.cpp inc/Vector.h
 	cp inc/GrayBMP.h $(Output)

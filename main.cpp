@@ -6,6 +6,7 @@
 #include "Filter.h"
 #include "Vector.h"
 #include "Matrix.h"
+#include "Draw.h"
 using namespace std;
 
 void printVec(Vector<Byte> &v)
@@ -66,7 +67,16 @@ void testDiff()
 	GrayBMP gaussian(gray);
 
 	//printBMP(gray);
+
 	Filter_Gaussian(gray,gaussian,3,1.5);
+	draw::Circle(gaussian,200,200,40);
+	draw::Line(gaussian,200,200,400,400);
+	draw::Line(gaussian,200,200,200,400);
+	draw::Line(gaussian,200,200,400,200);
+	draw::Cross(gaussian,200,200,5);
+	draw::Cross(gaussian,200,400,5);
+	draw::Cross(gaussian,400,200,5);
+	draw::Cross(gaussian,400,400,5);
 	WriteToFile(gaussian,"Filter_Gaussian.bmp");
 	Dx(gaussian,test);
 	//printBMP(test);
@@ -85,17 +95,21 @@ void testDiff()
 void testGaussian()
 {
 	
-	double a[5][5];
-	double var=3;
+	double Var=3;
+	int Range=5;
+	int mid=2;
+	Vector<float> gaussian(Range*Range);
+	int k=0;
 	for (int i = 0; i < 5; ++i)
 	{
 		for(int j=0; j < 5; ++j)
 		{
-			a[i][j]=Math::Gaussian(i-2,j-2,var);
-			printf("%lf  ",a[i][j] );
+			gaussian[k++]=Math::Gaussian(i-mid,j-mid,Var);
+			printf("%lf  ",gaussian[k-1] );
 		}
 		printf("\n");
 	}
+	printf("%f\n",gaussian.sum() );
 	cin.get();
 }
 
@@ -110,11 +124,12 @@ void testOpticalFlow()
 	ConvertToGray(Input1,gray1);
 	ConvertToGray(Input2,gray2);
 
+	
+	gray1=DownSampling(gray1,2);
+	gray2=DownSampling(gray2,2);
 	GrayBMP dx(gray1.TellWidth(),gray1.TellHeight()),
 	        dy(gray1.TellWidth(),gray1.TellHeight()),
 	        dt(gray1.TellWidth(),gray1.TellHeight());
-	gray1=DownSampling(gray1,2);
-	gray2=DownSampling(gray2,2);
 	Dx(gray1,dx);
 	Dy(gray1,dy);
 	dt=gray2-gray1;
@@ -122,7 +137,7 @@ void testOpticalFlow()
 
 	int Range=3;
 	int mid=1;
-	float Var=10;
+	float Var=1;
 	Vector<float> gaussian(Range*Range);
 	int k=0;
 	for (int i = 0; i < Range; ++i)
@@ -132,9 +147,11 @@ void testOpticalFlow()
 			gaussian[k++]=Math::Gaussian(i-mid,j-mid,Var);
 		}
 	}
-	for (int i = 0; i < gray1.TellWidth(); ++i)
+
+	GrayBMP of(gray1.TellWidth(),gray1.TellHeight());
+	for (int i = 0; i < gray1.TellWidth(); i+=10)
 	{
-		for (int j = 0; j < gray1.TellHeight(); ++j)
+		for (int j = 0; j < gray1.TellHeight(); j+=10)
 		{
 			if (Limit::OutOfRange(i,Range,0,gray1.TellWidth()-1) ||
 				Limit::OutOfRange(j,Range,0,gray1.TellHeight()-1))
@@ -147,22 +164,22 @@ void testOpticalFlow()
 				Ix=dx.GetSquare(i,j,Range);
 				Iy=dy.GetSquare(i,j,Range);
 				It=dt.GetSquare(i,j,Range);
-
-				
+				Ix=Ix.dotProduct(gaussian);
+				Iy=Iy.dotProduct(gaussian);
 				Matrix<float> mat(2,2);
-				mat(0,0)=Ix*Ix.dotProduct(gaussian);
-				mat(0,1)=Ix*Iy.dotProduct(gaussian);
-				mat(1,0)=Ix*Iy.dotProduct(gaussian);
-				mat(1,1)=Iy*Iy.dotProduct(gaussian);
+				mat(0,0)=Ix*Ix;
+				mat(0,1)=Ix*Iy;
+				mat(1,0)=Ix*Iy;
+				mat(1,1)=Iy*Iy;
 
 				Vector<float> b(2),r(2);
-				b[0]=Ix.dotProduct(gaussian)*It*(-1);
-				b[1]=Iy.dotProduct(gaussian)*It*(-1);
+				b[0]=Ix*It*(-1);
+				b[1]=Iy*It*(-1);
 
-				r=mat.inv()*b*40;
-				
-				gray2(i,j)=Limit::GrayByte(r.norm2());
-			// #define Debug
+				r=mat.inv()*b;
+				draw::LineOffset(of,i,j,(int)r[0],(int)r[1]);
+				// draw::Cross(of,i,j,5);
+			//#define Debug
 			#ifdef Debug
 			Ix.printVec();
 			Iy.printVec();
@@ -177,7 +194,7 @@ void testOpticalFlow()
 			}
 		}
 	}	
-	WriteToFile(gray2,"of.bmp");
+	WriteToFile(of,"of.bmp");
 }
 
 void testMatrix()
@@ -195,8 +212,8 @@ void testMatrix()
 }
 int main()
 {
-	testGaussian();
-	testMatrix();
+	// testGaussian();
+	// testMatrix();
 	testOpticalFlow();
 	// testVector();
 	// 
