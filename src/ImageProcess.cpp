@@ -1,5 +1,7 @@
 #include "ImageProcess.h"
-#include "Util.cpp"
+#include "Util.h"
+#include "EasyBMP.h"
+#include "GrayBMP.h"
 
 
 void ConvertToGray(BMP &src,GrayBMP &dst)

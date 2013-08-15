@@ -1,5 +1,5 @@
 #include "Filter.h"
-#include "Util.cpp"
+#include "Util.h"
 #include "Vector.h"
 #include "GrayBMP.h"
 

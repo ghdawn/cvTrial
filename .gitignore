@@ -1,0 +1,7 @@
+*.o
+bin/*.*
+bin/
+*.bmp
+.cproject/
+.project/
+

@@ -1,6 +1,6 @@
 #include "GrayBMP.h"
 #include "stdio.h"
-#include "Util.cpp"
+#include "Util.h"
 
 int GrayBMP::TellWidth() const
 {

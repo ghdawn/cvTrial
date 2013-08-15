@@ -2,49 +2,34 @@
 CC = g++
 Output = bin/
 
-CFLAGS = -g
+CFLAGS = -g -Iinc/
 
-objs =Util.o GrayBMP.o Draw.o  EasyBMP.o  Filter.o ImageProcess.o main.o
+Obj = Obj/
+objs = $(Obj)GrayBMP.o $(Obj)Draw.o  $(Obj)EasyBMP.o  $(Obj)Filter.o $(Obj)ImageProcess.o $(Obj)main.o
 
-all: main
+all: $(Obj)main
 
-main: $(objs)
+$(Obj)main: $(objs)
 	$(CC) -o $(Output)main $(CFLAGS) $(objs) 
 
-Filter.o: inc/Filter.h src/Filter.cpp inc/Vector.h
-	cp inc/Filter.h $(Output)
-	cp src/Filter.cpp $(Output)
-	$(CC) $(CFLAGS) -c $(Output)Filter.cpp
+$(Obj)Filter.o: inc/Filter.h src/Filter.cpp inc/Vector.h
+	$(CC) $(CFLAGS) -c src/Filter.cpp -o $(Obj)Filter.o
 
-Util.o: src/Util.cpp
-	cp src/Util.cpp $(Output)
-	$(CC) $(CFLAGS) -c $(Output)Util.cpp
 	
-Draw.o: src/Draw.cpp inc/Draw.h
-	cp inc/Draw.h $(Output)
-	cp src/Draw.cpp $(Output)
-	$(CC) $(CFLAGS) -c $(Output)Draw.cpp
+$(Obj)Draw.o: src/Draw.cpp inc/Draw.h
+	$(CC) $(CFLAGS) -c src/Draw.cpp -o $(Obj)Draw.o
 	
-GrayBMP.o: inc/GrayBMP.h src/GrayBMP.cpp inc/Vector.h
-	cp inc/GrayBMP.h $(Output)
-	cp inc/Vector.h $(Output)
-	cp src/GrayBMP.cpp $(Output)
-	$(CC) $(CFLAGS) -c $(Output)GrayBMP.cpp
+$(Obj)GrayBMP.o: inc/GrayBMP.h src/GrayBMP.cpp inc/Vector.h
+	$(CC) $(CFLAGS) -c src/GrayBMP.cpp -o $(Obj)GrayBMP.o
 
-EasyBMP.o: lib/bmp/EasyBMP.cpp lib/bmp/EasyBMP*.h
-	cp lib/bmp/EasyBMP*.h $(Output)
-	cp lib/bmp/EasyBMP.cpp $(Output)
-	$(CC) $(CFLAGS) -c $(Output)EasyBMP.cpp
+$(Obj)EasyBMP.o: src/EasyBMP.cpp inc/EasyBMP*.h
+	$(CC) $(CFLAGS) -c src/EasyBMP.cpp -o $(Obj)EasyBMP.o
+	
+$(Obj)ImageProcess.o: inc/ImageProcess.h src/ImageProcess.cpp
+	$(CC) $(CFLAGS) -c src/ImageProcess.cpp -o $(Obj)ImageProcess.o
 
-ImageProcess.o: inc/ImageProcess.h src/ImageProcess.cpp
-	cp inc/ImageProcess.h $(Output)
-	cp src/ImageProcess.cpp $(Output)
-	$(CC) $(CFLAGS) -c $(Output)ImageProcess.cpp
-
-main.o: main.cpp inc/Vector.h inc/Matrix.h
-	cp inc/*.h $(Output)
-	cp main.cpp $(Output)
-	$(CC) $(CFLAGS) -c $(Output)main.cpp
+$(Obj)main.o: main.cpp inc/Vector.h inc/Matrix.h
+	$(CC) $(CFLAGS) -c main.cpp -o $(Obj)main.o
 
 clean: 
 	rm -f *.o

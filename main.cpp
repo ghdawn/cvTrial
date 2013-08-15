@@ -2,7 +2,7 @@
 #include "EasyBMP.h"
 #include "ImageProcess.h"
 #include "GrayBMP.h"
-#include "Util.cpp"
+#include "Util.h"
 #include "Filter.h"
 #include "Vector.h"
 #include "Matrix.h"
@@ -70,9 +70,12 @@ void testDiff()
 
 	Filter_Gaussian(gray, gaussian, 3, 1.5);
 	draw::Circle(gaussian, 200, 200, 40);
-	draw::LineOffset(gaussian, 200, 200, 0, 200);
-	draw::LineOffset(gaussian, 200, 200, 200, 0);
-	draw::LineOffset(gaussian, 200, 200, 200, 200);
+//	draw::LineOffset(gaussian, 300, 200, 0, 100);
+//	draw::LineOffset(gaussian, 300, 200, 100, 0);
+	draw::LineOffset(gaussian, 300, 200, 100, 100);
+//	draw::LineOffset(gaussian, 300, 200, 0, -100);
+//	draw::LineOffset(gaussian, 300, 200, -100, 0);
+	draw::LineOffset(gaussian, 300, 200, 100, -100);
 	draw::Cross(gaussian, 200, 200, 5);
 	draw::Cross(gaussian, 200, 400, 5);
 	draw::Cross(gaussian, 400, 200, 5);
@@ -154,8 +157,8 @@ void testOpticalFlow()
 	Filter_Gaussian_Applyto(Ixt, 5, 1);
 	Filter_Gaussian_Applyto(Iyt, 5, 1);
 	Vector<float> u(2);
-	for (int i = 0; i < width; i += 10)
-		for (int j = 0; j < height; j += 10)
+	for (int i = 0; i < width; i += 5)
+		for (int j = 0; j < height; j += 5)
 		{
 			const float xx = Ixx(i, j);
 			const float yy = Iyy(i, j);
@@ -174,7 +177,7 @@ void testOpticalFlow()
 				u[1]=(xx*yt-xy*xt)/det;
 //				printf("X:(%d,%d)\nU:(%d,%d)\n",i,j,(int)u[0],(int)u[1]);
 				draw::LineOffset(gray1,i,j,(int)u[0],(int)u[1]);
-				draw::Cross(gray1,i+(int)u[0],j+(int)u[1],3);
+//				draw::Cross(gray1,i+(int)u[0],j+(int)u[1],3);
 			}
 		}
 	WriteToFile(gray1, "of.bmp");

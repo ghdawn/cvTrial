@@ -6,7 +6,7 @@
 #include "string.h"
 #include "iostream"
 #include "cstdio"
-#include "Util.cpp"
+#include "Util.h"
 using namespace std;
 
 template<typename T>
