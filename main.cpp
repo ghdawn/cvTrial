@@ -151,11 +151,11 @@ void testOpticalFlow()
 			Iyt(i, j) = iy * it;
 		}
 	}
-	Filter_Gaussian_Applyto(Ixx, 5, 1);
-	Filter_Gaussian_Applyto(Ixy, 5, 1);
-	Filter_Gaussian_Applyto(Iyy, 5, 1);
-	Filter_Gaussian_Applyto(Ixt, 5, 1);
-	Filter_Gaussian_Applyto(Iyt, 5, 1);
+	Filter_Gaussian_Applyto(Ixx, 5, 7);
+	Filter_Gaussian_Applyto(Ixy, 5, 7);
+	Filter_Gaussian_Applyto(Iyy, 5, 7);
+	Filter_Gaussian_Applyto(Ixt, 5, 7);
+	Filter_Gaussian_Applyto(Iyt, 5, 7);
 	Vector<float> u(2);
 	for (int i = 0; i < width; i += 5)
 		for (int j = 0; j < height; j += 5)
@@ -173,10 +173,10 @@ void testOpticalFlow()
 			{
 				const float xt = Ixt(i, j);
 				const float yt = Iyt(i, j);
-				u[0]=(yy*xt-xy*yt)/det;
-				u[1]=(xx*yt-xy*xt)/det;
+				u[0] = (yy * xt - xy * yt) / det;
+				u[1] = (xx * yt - xy * xt) / det;
 //				printf("X:(%d,%d)\nU:(%d,%d)\n",i,j,(int)u[0],(int)u[1]);
-				draw::LineOffset(gray1,i,j,(int)u[0],(int)u[1]);
+				draw::LineOffset(gray1, i, j, (int) u[0], (int) u[1]);
 //				draw::Cross(gray1,i+(int)u[0],j+(int)u[1],3);
 			}
 		}

@@ -32,8 +32,6 @@ $(Obj)main.o: main.cpp inc/Vector.h inc/Matrix.h
 	$(CC) $(CFLAGS) -c main.cpp -o $(Obj)main.o
 
 clean: 
-	rm -f *.o
 	rm -f *.bmp
-	rm $(Output)*.h
-	rm $(Output)*.cpp
+	rm $(Obj)*.o
 	
