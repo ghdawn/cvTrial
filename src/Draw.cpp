@@ -20,7 +20,23 @@ namespace draw
 
 	void LineOffset(GrayBMP &bmp,int x,int y,int offsetx,int offsety)
 	{
-		Line(bmp,x,y,x+offsetx,y+offsety);
+		int E=offsetx+offsety,flag=0;
+		bmp(x,y)=255;
+		while(E>0)
+		{
+			if(flag>=0)
+			{
+				++x;
+				flag-=offsety;
+			}
+			else
+			{
+				++y;
+				flag+=offsetx;
+			}
+			--E;
+			bmp(x,y)=255;
+		}
 	}
 
 	void Line(GrayBMP &bmp,int x1,int y1,int x2,int y2)//绘制直线函数

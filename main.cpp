@@ -31,13 +31,13 @@ void testVector()
 	Vector<Byte> v(10);
 	for (int i = 0; i < 10; ++i)
 	{
-		v[i]=1;
+		v[i] = 1;
 	}
 	printVec(v);
 	Vector<Byte> b;
-	b=v;
-    printVec(b);
-	printf("%d %d\n", v*b,b*v);
+	b = v;
+	printVec(b);
+	printf("%d %d\n", v * b, b * v);
 	printVec(v);
 	printVec(b);
 }
@@ -48,7 +48,7 @@ void printBMP(const GrayBMP& test)
 	{
 		for (int j = 0; j < 20; ++j)
 		{
-			printf("%3d ", test(i,j));
+			printf("%3d ", test(i, j));
 		}
 		printf("\n");
 	}
@@ -60,164 +60,149 @@ void testDiff()
 	BMP Input;
 	GrayBMP gray;
 	Input.ReadFromFile("img/table1.bmp");
-	gray.SetSize(Input.TellWidth(),Input.TellHeight());
-	ConvertToGray(Input,gray);
-	WriteToFile(gray,"gray.bmp");
+	gray.SetSize(Input.TellWidth(), Input.TellHeight());
+	ConvertToGray(Input, gray);
+	WriteToFile(gray, "gray.bmp");
 	GrayBMP test(gray);
 	GrayBMP gaussian(gray);
 
 	//printBMP(gray);
 
-	Filter_Gaussian(gray,gaussian,3,1.5);
-	draw::Circle(gaussian,200,200,40);
-	draw::Line(gaussian,200,200,400,400);
-	draw::Line(gaussian,200,200,200,400);
-	draw::Line(gaussian,200,200,400,200);
-	draw::Cross(gaussian,200,200,5);
-	draw::Cross(gaussian,200,400,5);
-	draw::Cross(gaussian,400,200,5);
-	draw::Cross(gaussian,400,400,5);
-	WriteToFile(gaussian,"Filter_Gaussian.bmp");
-	Dx(gaussian,test);
+	Filter_Gaussian(gray, gaussian, 3, 1.5);
+	draw::Circle(gaussian, 200, 200, 40);
+	draw::LineOffset(gaussian, 200, 200, 0, 200);
+	draw::LineOffset(gaussian, 200, 200, 200, 0);
+	draw::LineOffset(gaussian, 200, 200, 200, 200);
+	draw::Cross(gaussian, 200, 200, 5);
+	draw::Cross(gaussian, 200, 400, 5);
+	draw::Cross(gaussian, 400, 200, 5);
+	draw::Cross(gaussian, 400, 400, 5);
+	WriteToFile(gaussian, "Filter_Gaussian.bmp");
+	Dx(gaussian, test);
 	//printBMP(test);
-	WriteToFile(test,"dx.bmp");
+	WriteToFile(test, "dx.bmp");
 
-	Dy(gaussian,test);
+	Dy(gaussian, test);
 	//printBMP(test);
-	WriteToFile(test,"Dy.bmp");
+	WriteToFile(test, "Dy.bmp");
 
-	Sobel(gaussian,test);
+	Sobel(gaussian, test);
 	//printBMP(test);
-	WriteToFile(test,"Sobel.bmp");
+	WriteToFile(test, "Sobel.bmp");
 }
-
 
 void testGaussian()
 {
-	
-	double Var=3;
-	int Range=5;
-	int mid=2;
-	Vector<float> gaussian(Range*Range);
-	int k=0;
+
+	double Var = 3;
+	int Range = 5;
+	int mid = 2;
+	Vector<float> gaussian(Range * Range);
+	int k = 0;
 	for (int i = 0; i < 5; ++i)
 	{
-		for(int j=0; j < 5; ++j)
+		for (int j = 0; j < 5; ++j)
 		{
-			gaussian[k++]=Math::Gaussian(i-mid,j-mid,Var);
-			printf("%lf  ",gaussian[k-1] );
+			gaussian[k++] = Math::Gaussian(i - mid, j - mid, Var);
+			printf("%lf  ", gaussian[k - 1]);
 		}
 		printf("\n");
 	}
-	printf("%f\n",gaussian.sum() );
+	printf("%f\n", gaussian.sum());
 	cin.get();
 }
 
 void testOpticalFlow()
 {
-	BMP Input1,Input2;
-	GrayBMP gray1,gray2;
+	BMP Input1, Input2;
+	GrayBMP gray1, gray2;
 	Input1.ReadFromFile("img/table1.bmp");
 	Input2.ReadFromFile("img/table2.bmp");
-	gray1.SetSize(Input1.TellWidth(),Input1.TellHeight());
-	gray2.SetSize(Input1.TellWidth(),Input1.TellHeight());
-	ConvertToGray(Input1,gray1);
-	ConvertToGray(Input2,gray2);
+	gray1.SetSize(Input1.TellWidth(), Input1.TellHeight());
+	gray2.SetSize(Input1.TellWidth(), Input1.TellHeight());
+	ConvertToGray(Input1, gray1);
+	ConvertToGray(Input2, gray2);
 
-	
-	gray1=DownSampling(gray1,2);
-	gray2=DownSampling(gray2,2);
-	GrayBMP dx(gray1.TellWidth(),gray1.TellHeight()),
-	        dy(gray1.TellWidth(),gray1.TellHeight()),
-	        dt(gray1.TellWidth(),gray1.TellHeight());
-	Dx(gray1,dx);
-	Dy(gray1,dy);
-	dt=gray2-gray1;
-	WriteToFile(dt,"Dt.bmp");
-
-	int Range=3;
-	int mid=1;
-	float Var=1;
-	Vector<float> gaussian(Range*Range);
-	int k=0;
-	for (int i = 0; i < Range; ++i)
+	gray1 = DownSampling(gray1, 2);
+	gray2 = DownSampling(gray2, 2);
+	int width = gray1.TellWidth();
+	int height = gray1.TellHeight();
+	GrayBMP dx(width, height), dy(width, height), dt(width, height);
+	Dx(gray1, dx);
+	Dy(gray1, dy);
+	dt = gray2 - gray1;
+	WriteToFile(dt, "Dt.bmp");
+	GrayBMP Ixx(width, height), Iyy(width, height), Ixy(width, height), Ixt(
+			width, height), Iyt(width, height);
+	for (int i = 0; i < width; ++i)
 	{
-		for(int j=0; j < Range; ++j)
+		for (int j = 0; j < height; ++j)
 		{
-			gaussian[k++]=Math::Gaussian(i-mid,j-mid,Var);
+			const float ix = dx(i, j);
+			const float iy = dy(i, j);
+			const float it = dt(i, j);
+			Ixx(i, j) = ix * ix;
+			Iyy(i, j) = iy * iy;
+			Ixy(i, j) = ix * iy;
+			Ixt(i, j) = ix * it;
+			Iyt(i, j) = iy * it;
 		}
 	}
-
-	GrayBMP of(gray1.TellWidth(),gray1.TellHeight());
-	for (int i = 0; i < gray1.TellWidth(); i+=10)
-	{
-		for (int j = 0; j < gray1.TellHeight(); j+=10)
+	Filter_Gaussian_Applyto(Ixx, 5, 1);
+	Filter_Gaussian_Applyto(Ixy, 5, 1);
+	Filter_Gaussian_Applyto(Iyy, 5, 1);
+	Filter_Gaussian_Applyto(Ixt, 5, 1);
+	Filter_Gaussian_Applyto(Iyt, 5, 1);
+	Vector<float> u(2);
+	for (int i = 0; i < width; i += 10)
+		for (int j = 0; j < height; j += 10)
 		{
-			if (Limit::OutOfRange(i,Range,0,gray1.TellWidth()-1) ||
-				Limit::OutOfRange(j,Range,0,gray1.TellHeight()-1))
+			const float xx = Ixx(i, j);
+			const float yy = Iyy(i, j);
+			const float xy = Ixy(i, j);
+			const float det = xx * yy - xy * xy;
+
+			if (Math::Abs(det) < 0.1)
 			{
-				gray2(i,j)=255;
+				u[0] = u[1] = 0;
 			}
 			else
 			{
-				Vector<float> Ix,Iy,It;
-				Ix=dx.GetSquare(i,j,Range);
-				Iy=dy.GetSquare(i,j,Range);
-				It=dt.GetSquare(i,j,Range);
-				Ix=Ix.dotProduct(gaussian);
-				Iy=Iy.dotProduct(gaussian);
-				Matrix<float> mat(2,2);
-				mat(0,0)=Ix*Ix;
-				mat(0,1)=Ix*Iy;
-				mat(1,0)=Ix*Iy;
-				mat(1,1)=Iy*Iy;
-
-				Vector<float> b(2),r(2);
-				b[0]=Ix*It*(-1);
-				b[1]=Iy*It*(-1);
-
-				r=mat.inv()*b;
-				draw::LineOffset(of,i,j,(int)r[0],(int)r[1]);
-				// draw::Cross(of,i,j,5);
-			//#define Debug
-			#ifdef Debug
-			Ix.printVec();
-			Iy.printVec();
-			It.printVec();
-			mat.printMatrix();
-			mat.inv().printMatrix();
-			b.printVec();
-			r.printVec();
-			cout<<gray2(i,j)<<endl;
-			cin.get();
-			#endif
+				const float xt = Ixt(i, j);
+				const float yt = Iyt(i, j);
+				u[0]=(yy*xt-xy*yt)/det;
+				u[1]=(xx*yt-xy*xt)/det;
+//				printf("X:(%d,%d)\nU:(%d,%d)\n",i,j,(int)u[0],(int)u[1]);
+				draw::LineOffset(gray1,i,j,(int)u[0],(int)u[1]);
+				draw::Cross(gray1,i+(int)u[0],j+(int)u[1],3);
 			}
 		}
-	}	
-	WriteToFile(of,"of.bmp");
+	WriteToFile(gray1, "of.bmp");
 }
 
 void testMatrix()
 {
-	float data[]={1,1,1,-1};
-	Matrix<float> mat(2,2,data);
+	float data[] =
+	{ 1, 1, 1, -1 };
+	Matrix<float> mat(2, 2, data);
 	mat.printMatrix();
-	Matrix<float> mat2=mat.inv();
+	Matrix<float> mat2 = mat.inv();
 	mat2.printMatrix();
-	Vector<float> result(2),b(2);
-	b[0]=2;
-	b[1]=1;
-	result=mat2*b;
+	Vector<float> result(2), b(2);
+	b[0] = 2;
+	b[1] = 1;
+	result = mat2 * b;
 	printVec(result);
 }
 int main()
 {
 	// testGaussian();
 	// testMatrix();
+//	testDiff();
 	testOpticalFlow();
 	// testVector();
 	// 
-	// testDiff();
+
 	// testOpticalFlow();
 
 	return 0;

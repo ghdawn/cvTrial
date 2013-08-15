@@ -6,10 +6,10 @@ CFLAGS = -g
 
 objs =Util.o GrayBMP.o Draw.o  EasyBMP.o  Filter.o ImageProcess.o main.o
 
+all: main
 
 main: $(objs)
 	$(CC) -o $(Output)main $(CFLAGS) $(objs) 
-	./$(Output)main
 
 Filter.o: inc/Filter.h src/Filter.cpp inc/Vector.h
 	cp inc/Filter.h $(Output)
