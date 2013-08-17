@@ -8,6 +8,7 @@ void Dx(GrayBMP &src,GrayBMP &dx);
 void Dy(GrayBMP &src,GrayBMP &dx);
 void Sobel(GrayBMP &src,GrayBMP &dx);
 void WriteToFile(GrayBMP &src,const char* filename);
-GrayBMP DownSampling(const GrayBMP & bmp,int scale);
+void DownSampling(const GrayBMP & bmp, GrayBMP& result, int scale);
+void Scaling(const GrayBMP& src,GrayBMP& dst);
 
 #endif

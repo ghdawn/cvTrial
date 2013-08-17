@@ -167,6 +167,7 @@ void GrayBMP::Dispose()
 		delete[] data[i];
 	}
 	delete[] data;
+	data=NULL;
 }
 GrayBMP::~GrayBMP()
 {

@@ -31,8 +31,8 @@ namespace Math
 
 	inline double Gaussian(int i, int j, double Var)
 	{
-		return exp(-(Square(i) + Square(j)) / (2 * Var * Var))
-				/ (2 * PI * Var * Var);
+		double factor = 2 * Var * Var;
+		return exp(-(Square(i) + Square(j)) / (2 * factor)) / (PI * factor);
 	}
 
 }

@@ -63,6 +63,7 @@ void Vector<T>::Dispose()
 		return;
 	}
 	delete [] data;
+	data=NULL;
 }
 template<typename T>
 Vector<T>::Vector(int dim, T* Data)
