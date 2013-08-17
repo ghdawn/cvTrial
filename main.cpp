@@ -126,7 +126,7 @@ void testOpticalFlow()
     ConvertToGray(Input1, grayBig1);
     ConvertToGray(Input2, grayBig2);
     DownSampling(grayBig1,gray1, 2);
-    DownSampling(grayBig1,gray2, 2);
+    DownSampling(grayBig2,gray2, 2);
     int width = gray1.TellWidth();
     int height = gray1.TellHeight();
     GrayBMP dx(width, height), dy(width, height), dt(width, height);
@@ -177,6 +177,7 @@ void testOpticalFlow()
                 u[1] = (xx * yt - xy * xt) / det;
                 // printf("X:(%d,%d)\nU:(%d,%d)\n",i,j,static_cast<int>(u[0]),static_cast<int>(u[1]));
                 draw::LineOffset(gray1, i, j, static_cast<int>(u[0]), static_cast<int>(u[1]));
+//  s              draw::LineOffset(gray1, i, j, (int)(u[0]), (int)(u[1]));
                 // draw::Cross(gray1,i+static_cast<int>(u[0]),j+static_cast<int>(u[1]),3);
             }
         }
@@ -201,7 +202,7 @@ int main()
 {
     // testGaussian();
     // testMatrix();
-    // testDiff();
+    testDiff();
     testOpticalFlow();
     // testVector();
     // testOpticalFlow();
