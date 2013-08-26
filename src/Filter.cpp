@@ -4,7 +4,7 @@
 #include "GrayBMP.h"
 
 
-void Filter_Gaussian(GrayBMP &src, GrayBMP &dst, const GaussianModel& gaussian)
+void Filter_Gaussian(const GrayBMP &src, GrayBMP &dst, const GaussianModel& gaussian)
 {
 	float w = 1 / gaussian.gaussian.sum();
 	for (int i = 0; i < src.TellWidth(); ++i)
@@ -52,7 +52,7 @@ void Filter_Gaussian_Applyto(GrayBMP &target, const GaussianModel& gaussian)
 	}
 }
 
-void Filter_Median(GrayBMP &src, GrayBMP &dst, int Range)
+void Filter_Median(const GrayBMP &src, GrayBMP &dst, int Range)
 {
 	for (int i = 0; i < src.TellWidth(); ++i)
 	{

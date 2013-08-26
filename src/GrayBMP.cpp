@@ -10,7 +10,7 @@ int GrayBMP::TellHeight() const
 {
 	return Height;
 }
-Vector<float> GrayBMP::GetSquare(int x, int y, int Range)
+Vector<float> GrayBMP::GetSquare(int x, int y, int Range) const
 {
 	// printf("(%d,%d)\n", x,y);
 	Vector<float> vec(Range * Range);

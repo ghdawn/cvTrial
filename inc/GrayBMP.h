@@ -18,7 +18,7 @@ public:
 	void Dispose();
 	int TellWidth() const;
 	int TellHeight() const;
-	Vector<float> GetSquare(int i,int j,int Range);
+	Vector<float> GetSquare(int i,int j,int Range) const;
 	void SetSize(int,int);
 	bool MatchSize(int ,int );
 	//Operator

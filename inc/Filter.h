@@ -34,7 +34,7 @@ public:
 	Vector<float> gaussian;
 };
 void Filter_Gaussian_Applyto(GrayBMP &target, const GaussianModel& gaussian);
-void Filter_Gaussian(GrayBMP &src, GrayBMP &dst, const GaussianModel& gaussian);
-void Filter_Median(GrayBMP &src, GrayBMP &dst, int Range);
+void Filter_Gaussian(const GrayBMP &src, GrayBMP &dst, const GaussianModel& gaussian);
+void Filter_Median(const GrayBMP &src, GrayBMP &dst, int Range);
 
 #endif

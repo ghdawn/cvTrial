@@ -58,5 +58,10 @@ namespace Limit
 		}
 		return a;
 	}
+
+	inline int Round(float a)
+	{
+		return static_cast<int>(a+0.5);
+	}
 }
 #endif
