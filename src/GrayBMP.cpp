@@ -2,41 +2,24 @@
 #include "stdio.h"
 #include "Util.h"
 
-int GrayBMP::TellWidth() const
+int GrayBMP::getWidth() const
 {
-	return Width;
+	return width;
 }
-int GrayBMP::TellHeight() const
+int GrayBMP::getHeight() const
 {
-	return Height;
-}
-Vector<float> GrayBMP::GetSquare(int x, int y, int Range) const
-{
-	// printf("(%d,%d)\n", x,y);
-	Vector<float> vec(Range * Range);
-	int k = 0;
-	Range /= 2;
-	for (int i = x - Range; i <= x + Range; ++i)
-	{
-		for (int j = y - Range; j <= y + Range; ++j)
-		{
-			vec[k++] = data[i][j];
-			// printf("%d ",data[i][j] );
-		}
-		// printf("\n");
-	}
-	return vec;
+	return height;
 }
 
 bool GrayBMP::MatchSize(int width, int height)
 {
-	return (width == Width) && (height == Height);
+	return (this->width == width) && (this->height == height);
 }
 
 int& GrayBMP::operator()(int i, int j)
 {
 	bool Warn = false;
-	if (i >= Width)
+	if (i >= width)
 	{
 		Warn = true;
 	}
@@ -44,7 +27,7 @@ int& GrayBMP::operator()(int i, int j)
 	{
 		Warn = true;
 	}
-	if (j >= Height)
+	if (j >= height)
 	{
 		Warn = true;
 	}
@@ -64,7 +47,7 @@ int& GrayBMP::operator()(int i, int j)
 int GrayBMP::operator()(int i, int j) const
 {
 	bool Warn = false;
-	if (i >= Width)
+	if (i >= width)
 	{
 		Warn = true;
 	}
@@ -72,7 +55,7 @@ int GrayBMP::operator()(int i, int j) const
 	{
 		Warn = true;
 	}
-	if (j >= Height)
+	if (j >= height)
 	{
 		Warn = true;
 	}
@@ -90,10 +73,10 @@ int GrayBMP::operator()(int i, int j) const
 }
 GrayBMP& GrayBMP::operator=(const GrayBMP& Input)
 {
-	SetSize(Input.TellWidth(), Input.TellHeight());
-	for (int i = 0; i < Width; ++i)
+	SetSize(Input.getWidth(), Input.getHeight());
+	for (int i = 0; i < width; ++i)
 	{
-		for (int j = 0; j < Height; ++j)
+		for (int j = 0; j < height; ++j)
 		{
 			data[i][j] = Input(i, j);
 		}
@@ -103,15 +86,15 @@ GrayBMP& GrayBMP::operator=(const GrayBMP& Input)
 
 GrayBMP GrayBMP::operator-(const GrayBMP& Input)
 {
-	GrayBMP result(Width, Height);
-	if (Width != Input.TellWidth() || Height != Input.TellHeight())
+	GrayBMP result(width, height);
+	if (width != Input.getWidth() || height != Input.getHeight())
 	{
 		printf("width and height must  agree\n");
 		return result;
 	}
-	for (int i = 0; i < Width; ++i)
+	for (int i = 0; i < width; ++i)
 	{
-		for (int j = 0; j < Height; ++j)
+		for (int j = 0; j < height; ++j)
 		{
 			result(i, j) = Limit::GrayByte(data[i][j] - Input(i, j));
 		}
@@ -121,22 +104,22 @@ GrayBMP GrayBMP::operator-(const GrayBMP& Input)
 void GrayBMP::SetSize(int newWidth, int newHeight)
 {
 	Dispose();
-	Width = newWidth;
-	Height = newHeight;
-	data = new int*[Width];
+	width = newWidth;
+	height = newHeight;
+	data = new int*[width];
 
-	for (int i = 0; i < Width; i++)
+	for (int i = 0; i < width; i++)
 	{
-		data[i] = new int[Height];
+		data[i] = new int[height];
 	}
 }
 
 GrayBMP::GrayBMP()
 {
-	Width = 1;
-	Height = 1;
-	data = new int*[Width];
-	data[0] = new int[Height];
+	width = 1;
+	height = 1;
+	data = new int*[width];
+	data[0] = new int[height];
 }
 
 GrayBMP::GrayBMP(int width, int height)
@@ -147,10 +130,10 @@ GrayBMP::GrayBMP(int width, int height)
 GrayBMP::GrayBMP(GrayBMP& Input)
 {
 	data = NULL;
-	SetSize(Input.TellWidth(), Input.TellHeight());
-	for (int i = 0; i < Width; ++i)
+	SetSize(Input.getWidth(), Input.getHeight());
+	for (int i = 0; i < width; ++i)
 	{
-		for (int j = 0; j < Height; ++j)
+		for (int j = 0; j < height; ++j)
 		{
 			data[i][j] = Input(i, j);
 		}
@@ -162,12 +145,12 @@ void GrayBMP::Dispose()
 	int i;
 	if (data == NULL)
 		return;
-	for (i = 0; i < Width; i++)
+	for (i = 0; i < width; i++)
 	{
 		delete[] data[i];
 	}
 	delete[] data;
-	data=NULL;
+	data = NULL;
 }
 GrayBMP::~GrayBMP()
 {

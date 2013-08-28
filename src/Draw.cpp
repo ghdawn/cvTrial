@@ -3,26 +3,26 @@
 
 namespace draw
 {
-void Circle(GrayBMP& bmp, int x, int y, int r)
+void Circle(GrayBMP& bmp, int x, int y, int r, int color)
 {
 	int i, j;
-	int width = bmp.TellWidth();
-	int height = bmp.TellHeight();
+	int width = bmp.getWidth();
+	int height = bmp.getHeight();
 	for (i = -r; i < r; i++)
 	{
 		j = sqrt(r * r - i * i);
-		bmp((i + x) % width, (j + y) % height) = 255;
-		bmp((i + x) % width, (-j + y) % height) = 255;
-		bmp((j + x) % width, (i + y) % height) = 255;
-		bmp((-j + x) % width, (i + y) % height) = 255;
+		bmp((i + x) % width, (j + y) % height) = color;
+		bmp((i + x) % width, (-j + y) % height) = color;
+		bmp((j + x) % width, (i + y) % height) = color;
+		bmp((-j + x) % width, (i + y) % height) = color;
 	}
 }
 
-void LineOffset(GrayBMP &bmp, int X, int Y, int offsetx, int offsety)
+void LineOffset(GrayBMP &bmp, int X, int Y, int offsetx, int offsety, int color)
 {
 	float l = sqrt(offsetx * offsetx + offsety * offsety);
-	int width = bmp.TellWidth() - 1;
-	int height = bmp.TellHeight() - 1;
+	int width = bmp.getWidth() - 1;
+	int height = bmp.getHeight() - 1;
 	float x = X, y = Y;
 //	printf("X:(%d,%d)\nU:(%d,%d)\n",X,Y,offsetx,offsety);
 	for (int i = 0; i < l; ++i)
@@ -35,18 +35,18 @@ void LineOffset(GrayBMP &bmp, int X, int Y, int offsetx, int offsety)
 		{
 			continue;
 		}
-		bmp((int) x, (int) y) = 255;
+		bmp((int) x, (int) y) = color;
 	}
 }
 
-void Line(GrayBMP &bmp, int x1, int y1, int x2, int y2) //绘制直线函数
+void Line(GrayBMP &bmp, int x1, int y1, int x2, int y2, int color) //绘制直线函数
 {
-	LineOffset(bmp, x1, y1, x2 - x1, y2 - y1);
+	LineOffset(bmp, x1, y1, x2 - x1, y2 - y1, color);
 }
 
-void Cross(GrayBMP &bmp, int x, int y, int scale) //显示屏指针显示函数
+void Cross(GrayBMP &bmp, int x, int y, int scale, int color) //显示屏指针显示函数
 {
-	LineOffset(bmp, x - scale, y, scale + scale, 0);
-	LineOffset(bmp, x, y - scale, 0, scale + scale);
+	LineOffset(bmp, x - scale, y, scale + scale, 0, color);
+	LineOffset(bmp, x, y - scale, 0, scale + scale, color);
 }
 }

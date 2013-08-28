@@ -5,7 +5,7 @@ Output = bin/
 CFLAGS = -g -Iinc/
 
 Obj = Obj/
-objs = $(Obj)GrayBMP.o $(Obj)Draw.o  $(Obj)EasyBMP.o  $(Obj)Filter.o $(Obj)ImageProcess.o $(Obj)main.o
+objs = $(Obj)GrayBMP.o $(Obj)Draw.o  $(Obj)EasyBMP.o $(Obj)ImgIO.o $(Obj)Filter.o $(Obj)ImageProcess.o $(Obj)main.o
 
 all: $(Obj)main
 
@@ -15,7 +15,8 @@ $(Obj)main: $(objs)
 $(Obj)Filter.o: inc/Filter.h src/Filter.cpp inc/Vector.h
 	$(CC) $(CFLAGS) -c src/Filter.cpp -o $(Obj)Filter.o
 
-	
+$(Obj)ImgIO.o: inc/ImgIO.h src/ImgIO.cpp
+	$(CC) $(CFLAGS) -c src/ImgIO.cpp -o  $(Obj)ImgIO.o
 $(Obj)Draw.o: src/Draw.cpp inc/Draw.h
 	$(CC) $(CFLAGS) -c src/Draw.cpp -o $(Obj)Draw.o
 	
