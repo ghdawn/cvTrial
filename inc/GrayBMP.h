@@ -6,7 +6,7 @@ class GrayBMP
     private:
         int width;
         int height;
-        int** data;
+        int* data;
     public:
         void Dispose();
         int getWidth() const;
@@ -19,7 +19,7 @@ class GrayBMP
         GrayBMP& operator=(const GrayBMP& Input);
         GrayBMP operator-(const GrayBMP& Input);
         GrayBMP();
-        GrayBMP(int width, int height);
+        GrayBMP(int Width, int Height);
         GrayBMP(GrayBMP& Input);
         ~GrayBMP();
 };

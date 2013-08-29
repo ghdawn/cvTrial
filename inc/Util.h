@@ -7,7 +7,7 @@ typedef unsigned char Byte;
 
 namespace Math
 {
-	const int PI = 3.1415926;
+	const float PI = 3.1415926;
 
 	inline double Square(float a)
 	{

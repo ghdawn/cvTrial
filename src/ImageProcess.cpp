@@ -61,7 +61,7 @@ void ImgProcess::Dy(const GrayBMP &src, GrayBMP &dy)
 
 void ImgProcess::Sobel(const GrayBMP &src, GrayBMP &result)
 {
-    if (result.MatchSize(src.getWidth(), src.getHeight()))
+    if (!result.MatchSize(src.getWidth(), src.getHeight()))
     {
         result.SetSize(src.getWidth(), src.getHeight());
     }
@@ -88,17 +88,17 @@ void ImgProcess::Sobel(const GrayBMP &src, GrayBMP &result)
     }
 }
 
-void ImgProcess::DownSampling(const GrayBMP & bmp, GrayBMP& result, int scale)
+void ImgProcess::DownSampling(const GrayBMP & src, GrayBMP& dst, int scale)
 {
-    if (result.MatchSize(bmp.getWidth() / scale, bmp.getHeight() / scale))
+    if (!dst.MatchSize(src.getWidth() / scale, src.getHeight() / scale))
     {
-        result.SetSize(bmp.getWidth() / scale, bmp.getHeight() / scale);
+        dst.SetSize(src.getWidth() / scale, src.getHeight() / scale);
     }
-    for (int i = 0; i < result.getWidth(); ++i)
+    for (int i = 0; i < dst.getWidth(); ++i)
     {
-        for (int j = 0; j < result.getHeight(); ++j)
+        for (int j = 0; j < dst.getHeight(); ++j)
         {
-            result(i, j) = bmp(i * scale, j * scale);
+            dst(i, j) = src(i * scale, j * scale);
         }
     }
 }
@@ -139,6 +139,20 @@ Vector<float> ImgProcess::GetSquare(const GrayBMP& src, int x, int y, int Range)
     for (int i = x - Range; i <= x + Range; ++i)
     {
         for (int j = y - Range; j <= y + Range; ++j)
+        {
+            vec[k++] = src(i, j);
+        }
+    }
+    return vec;
+}
+
+Vector<float> ImgProcess::toVector(const GrayBMP& src)
+{
+    Vector<float> vec(src.getWidth() * src.getHeight());
+    int k = 0;
+    for (int i = 0; i <src.getWidth(); ++i)
+    {
+        for (int j = 0; j <src.getHeight(); ++j)
         {
             vec[k++] = src(i, j);
         }

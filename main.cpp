@@ -7,6 +7,8 @@
 #include "inc/Vector.h"
 #include "inc/Matrix.h"
 #include "inc/Draw.h"
+#include "inc/Structure/Rect.h"
+#include "inc/Detector.h"
 
 void printVec(Vector<Byte> &v)
 {
@@ -114,12 +116,14 @@ void testGaussian()
 void testOpticalFlow()
 {
     GrayBMP gray1, gray2, grayBig1, grayBig2;
-    ImgIO::ReadFromFile("img/bmp/cap000.bmp", grayBig1);
-    ImgIO::ReadFromFile("img/bmp/cap003.bmp", grayBig2);
+    ImgIO::ReadFromFile("img/bmp/cap007.bmp", grayBig1);
+    ImgIO::ReadFromFile("img/bmp/cap008.bmp", grayBig2);
     int scale = 2;
     GaussianModel gSmooth(3, 0.5);
     ImgProcess::DownSampling(grayBig1, gray1, scale);
     ImgProcess::DownSampling(grayBig2, gray2, scale);
+    ImgIO::WriteToFile(grayBig1,"grayBig1.bmp");
+    ImgIO::WriteToFile(gray1,"gray1.bmp");
     Filter::Gaussian_Applyto(gray1, gSmooth);
     Filter::Gaussian_Applyto(gray2, gSmooth);
     int width = gray1.getWidth();
@@ -206,13 +210,36 @@ void testScaling()
     ImgIO::WriteToFile(test, "scal.bmp");
 
 }
+
+void testDetect()
+{
+    GrayBMP bmp,gray,patch;
+    char filename[25]="img/bmp/cap000.bmp";
+    ImgIO::ReadFromFile(filename,bmp);
+    ImgProcess::DownSampling(bmp,gray,2);
+    Rect rect(15,194,40,40);
+    ImgProcess::GetSquare(gray,patch,rect);
+    ImgIO::WriteToFile(patch,"Patch.bmp");
+    Detector detector(patch);
+    for(int i=1;i<101;i++)
+    {
+        sprintf(filename,"img/bmp/cap%03d.bmp",i);
+        ImgIO::ReadFromFile(filename,bmp);
+        ImgProcess::DownSampling(bmp,gray,2);
+        rect=detector.MatchPatch(gray);
+        draw::Rectangle(gray,rect,255);
+        sprintf(filename,"img/out/cap%03d.bmp",i);
+        ImgIO::WriteToFile(gray,filename);
+    }
+}
 int main()
 {
     // testGaussian();
     // testMatrix();
     // testDiff();
-    testScaling();
-    // testOpticalFlow();
+//    testScaling();
+//    testOpticalFlow();
+    testDetect();
     // testVector();
     // testOpticalFlow();
     return 0;

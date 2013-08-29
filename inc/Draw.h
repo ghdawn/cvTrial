@@ -2,6 +2,7 @@
 #define _INC_DRAW_H_
 
 class GrayBMP;
+class Rect;
 
 namespace draw
 {
@@ -9,5 +10,6 @@ namespace draw
 	void Line(GrayBMP &bmp,int x1,int y1,int x2,int y2,int color);
 	void LineOffset(GrayBMP &bmp,int x,int y,int offsetx,int offsety,int color);
 	void Cross(GrayBMP &bmp,int x,int y,int scale,int color);
+	void Rectangle(GrayBMP &bmp,Rect rect,int color);
 }
 #endif
