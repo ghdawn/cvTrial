@@ -15,7 +15,7 @@ class ImgProcess
         static void DownSampling(const GrayBMP & bmp, GrayBMP& result, int scale);
         static void Scaling(const GrayBMP& src, GrayBMP& dst);
         static Vector<float> GetSquare(const GrayBMP& src, int x, int y, int Range);
-        static Vector<float> toVector(const GrayBMP& src);
+        static Vector<int> toVector(const GrayBMP& src);
         static void GetSquare(const GrayBMP& src,GrayBMP& dst,Rect rect);
 };
 #endif

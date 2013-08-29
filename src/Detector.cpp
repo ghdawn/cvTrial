@@ -20,18 +20,18 @@ Detector::Detector(GrayBMP Patch)
 Rect Detector::MatchPatch(const GrayBMP& src)
 {
     GrayBMP box;
-    Vector<float> vbox, vpatch;
+    Vector<int> vbox, vpatch;
     vpatch = ImgProcess::toVector(patch);
     float best = 999999999, now;
     Rect result;
     result.setSize(rect.getWidth(), rect.getHeight());
-    for (int i = 0; i < src.getWidth()-rect.getWidth(); ++i)
-        for (int j = 0; j < src.getHeight()-rect.getHeight(); ++j)
+    for (int i = 0; i < src.getWidth()-rect.getWidth(); i+=4)
+        for (int j = 0; j < src.getHeight()-rect.getHeight(); j+=4)
         {
             rect.setPosition(i, j);
             ImgProcess::GetSquare(src, box, rect);
             vbox = ImgProcess::toVector(box)-vpatch;
-            now=vbox.norm1();
+            now=vbox.Norm1();
             if (now < best)
             {
                 best = now;

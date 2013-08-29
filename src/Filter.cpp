@@ -6,7 +6,7 @@
 
 void Filter::Gaussian(const GrayBMP &src, GrayBMP &dst, const GaussianModel& gaussian)
 {
-	float w = 1 / gaussian.gaussian.sum();
+	float w = 1 / gaussian.gaussian.Sum();
 	for (int i = 0; i < src.getWidth(); ++i)
 	{
 		for (int j = 0; j < src.getHeight(); ++j)
@@ -31,7 +31,7 @@ void Filter::Gaussian_Applyto(GrayBMP &target, const GaussianModel& gaussian)
 {
 	GrayBMP src(target);
 
-	float w = 1 / gaussian.gaussian.sum();
+	float w = 1 / gaussian.gaussian.Sum();
 	for (int i = 0; i < src.getWidth(); ++i)
 	{
 		for (int j = 0; j < src.getHeight(); ++j)

@@ -146,9 +146,9 @@ Vector<float> ImgProcess::GetSquare(const GrayBMP& src, int x, int y, int Range)
     return vec;
 }
 
-Vector<float> ImgProcess::toVector(const GrayBMP& src)
+Vector<int> ImgProcess::toVector(const GrayBMP& src)
 {
-    Vector<float> vec(src.getWidth() * src.getHeight());
+    Vector<int> vec(src.getWidth() * src.getHeight());
     int k = 0;
     for (int i = 0; i <src.getWidth(); ++i)
     {

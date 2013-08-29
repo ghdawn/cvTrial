@@ -40,7 +40,7 @@ class Vector
         Vector<T> operator*(float k);
         Vector<T> operator+(T t);
         Vector<T> operator+(const Vector<T>& t);
-        Vector<T> operator-(const Vector<T>& t);
+        Vector<T> operator-(const Vector<T>& t) const;
         inline T& operator[](int index)
         {
             return data[index];
@@ -54,9 +54,11 @@ class Vector
 
         //Calc
         Vector<T> dotProduct(const Vector<T> &vec) const;
-        T norm1() const;
-        float norm2() const;
-        T sum() const;
+        T Norm1() const;
+        float Norm2() const;
+        T Sum() const;
+        T Mean() const;
+        T Var() const;
 };
 
 template<typename T>
@@ -219,7 +221,7 @@ Vector<T> Vector<T>::operator+(const Vector<T>& vec)
 }
 
 template<typename T>
-inline Vector<T> Vector<T>::operator -(const Vector<T>& vec)
+inline Vector<T> Vector<T>::operator -(const Vector<T>& vec) const
 {
     Vector<T> result(vec.dim());
     if (matchDimension(vec))
@@ -262,7 +264,7 @@ Vector<T> Vector<T>::dotProduct(const Vector<T> &vec) const
     return result;
 }
 template<typename T>
-T Vector<T>::norm1() const
+T Vector<T>::Norm1() const
 {
     T ans = 0;
     for (int i = 0; i < _dim; ++i)
@@ -272,7 +274,7 @@ T Vector<T>::norm1() const
     return ans;
 }
 template<typename T>
-float Vector<T>::norm2() const
+float Vector<T>::Norm2() const
 {
     T ans = 0;
     for (int i = 0; i < _dim; ++i)
@@ -284,7 +286,7 @@ float Vector<T>::norm2() const
 
 
 template<typename T>
-T Vector<T>::sum() const
+T Vector<T>::Sum() const
 {
     T ans = 0;
     for (int i = 0; i < _dim; ++i)
@@ -293,4 +295,21 @@ T Vector<T>::sum() const
     }
     return ans;
 }
+
+template<typename T>
+inline T Vector<T>::Mean() const
+{
+    return Sum()/_dim;
+}
+
+template<typename T>
+inline T Vector<T>::Var() const
+{
+    T mean=Mean();
+    T var=0;
+    for(int i=0;i<_dim;i++)
+        var+=Math::Square(data[i]-mean);
+    return var;
+}
+
 #endif

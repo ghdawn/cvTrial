@@ -9,6 +9,7 @@
 #include "inc/Draw.h"
 #include "inc/Structure/Rect.h"
 #include "inc/Detector.h"
+#include "assert.h"
 
 void printVec(Vector<Byte> &v)
 {
@@ -109,23 +110,12 @@ void testGaussian()
         }
         printf("\n");
     }
-    printf("%f\n", gaussian.sum());
+    printf("%f\n", gaussian.Sum());
     getchar();
 }
 
-void testOpticalFlow()
+void LK_Method(GrayBMP gray1, GrayBMP& gray2)
 {
-    GrayBMP gray1, gray2, grayBig1, grayBig2;
-    ImgIO::ReadFromFile("img/bmp/cap007.bmp", grayBig1);
-    ImgIO::ReadFromFile("img/bmp/cap008.bmp", grayBig2);
-    int scale = 2;
-    GaussianModel gSmooth(3, 0.5);
-    ImgProcess::DownSampling(grayBig1, gray1, scale);
-    ImgProcess::DownSampling(grayBig2, gray2, scale);
-    ImgIO::WriteToFile(grayBig1,"grayBig1.bmp");
-    ImgIO::WriteToFile(gray1,"gray1.bmp");
-    Filter::Gaussian_Applyto(gray1, gSmooth);
-    Filter::Gaussian_Applyto(gray2, gSmooth);
     int width = gray1.getWidth();
     int height = gray1.getHeight();
     GrayBMP dx(width, height), dy(width, height), dt(width, height);
@@ -164,7 +154,6 @@ void testOpticalFlow()
             const float yy = Iyy(i, j);
             const float xy = Ixy(i, j);
             const float det = xx * yy - xy * xy;
-
             if (Math::Abs(det) < 20)
             {
                 u[0] = u[1] = 0;
@@ -183,6 +172,22 @@ void testOpticalFlow()
             }
         }
     ImgIO::WriteToFile(gray1, "of.bmp");
+}
+
+void testOpticalFlow()
+{
+    GrayBMP gray1, gray2, grayBig1, grayBig2;
+    ImgIO::ReadFromFile("img/bmp/cap007.bmp", grayBig1);
+    ImgIO::ReadFromFile("img/bmp/cap008.bmp", grayBig2);
+    int scale = 2;
+    GaussianModel gSmooth(3, 0.5);
+    ImgProcess::DownSampling(grayBig1, gray1, scale);
+    ImgProcess::DownSampling(grayBig2, gray2, scale);
+    ImgIO::WriteToFile(grayBig1,"grayBig1.bmp");
+    ImgIO::WriteToFile(gray1,"gray1.bmp");
+    Filter::Gaussian_Applyto(gray1, gSmooth);
+    Filter::Gaussian_Applyto(gray2, gSmooth);
+    LK_Method(gray1, gray2);
 }
 
 void testMatrix()
@@ -214,16 +219,16 @@ void testScaling()
 void testDetect()
 {
     GrayBMP bmp,gray,patch;
-    char filename[25]="img/bmp/cap000.bmp";
+    char filename[25]="img/black/cap000.bmp";
     ImgIO::ReadFromFile(filename,bmp);
     ImgProcess::DownSampling(bmp,gray,2);
     Rect rect(15,194,40,40);
     ImgProcess::GetSquare(gray,patch,rect);
     ImgIO::WriteToFile(patch,"Patch.bmp");
     Detector detector(patch);
-    for(int i=1;i<101;i++)
+    for(int i=1;i<401;i++)
     {
-        sprintf(filename,"img/bmp/cap%03d.bmp",i);
+        sprintf(filename,"img/black/cap%03d.bmp",i);
         ImgIO::ReadFromFile(filename,bmp);
         ImgProcess::DownSampling(bmp,gray,2);
         rect=detector.MatchPatch(gray);
