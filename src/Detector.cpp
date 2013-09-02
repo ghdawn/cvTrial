@@ -38,5 +38,6 @@ Rect Detector::MatchPatch(const GrayBMP& src)
                 result.setPosition(i, j);
             }
         }
+    printf("Best:%f    ",best);
     return result;
 }

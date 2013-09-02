@@ -222,11 +222,11 @@ void testDetect()
     char filename[25]="img/black/cap000.bmp";
     ImgIO::ReadFromFile(filename,bmp);
     ImgProcess::DownSampling(bmp,gray,2);
-    Rect rect(15,194,40,40);
+    Rect rect(15,194,35,35);
     ImgProcess::GetSquare(gray,patch,rect);
     ImgIO::WriteToFile(patch,"Patch.bmp");
     Detector detector(patch);
-    for(int i=1;i<401;i++)
+    for(int i=1;i<400;i++)
     {
         sprintf(filename,"img/black/cap%03d.bmp",i);
         ImgIO::ReadFromFile(filename,bmp);
@@ -235,6 +235,7 @@ void testDetect()
         draw::Rectangle(gray,rect,255);
         sprintf(filename,"img/out/cap%03d.bmp",i);
         ImgIO::WriteToFile(gray,filename);
+        printf("%ddone\n",i);
     }
 }
 int main()
