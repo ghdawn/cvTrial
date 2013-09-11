@@ -19,33 +19,56 @@ bool GrayBMP::MatchSize(int width, int height)
 int& GrayBMP::operator()(int i, int j)
 {
     bool Warn = false;
-    if ((i >= width) || (i < 0))
+    if (i >= width)
     {
         Warn = true;
+        i = width - 1;
     }
-    if ((j >= height) || (j < 0))
+    if (i < 0)
     {
         Warn = true;
+        i = 0;
+    }
+    if (j >= height)
+    {
+        Warn = true;
+        j = height - 1;
+    }
+    if (j < 0)
+    {
+        Warn = true;
+        j = 0;
     }
     if (Warn)
     {
         printf("Warning: Attempted to access non-existent pixel:(%d,%d)\n", i,
                 j);
-        return data[0];
     }
-    return (data[i * height + j]);
+    return (data[j * width + i]);
 }
 
 int GrayBMP::operator()(int i, int j) const
 {
     bool Warn = false;
-    if ((i >= width) || (i < 0))
+    if (i >= width)
     {
         Warn = true;
+        i = width - 1;
     }
-    if ((j >= height) || (j < 0))
+    if (i < 0)
     {
         Warn = true;
+        i = 0;
+    }
+    if (j >= height)
+    {
+        Warn = true;
+        j = height - 1;
+    }
+    if (j < 0)
+    {
+        Warn = true;
+        j = 0;
     }
     if (Warn)
     {
@@ -53,18 +76,20 @@ int GrayBMP::operator()(int i, int j) const
                 j);
         return 0;
     }
-    return (data[i * height + j]);
+    return (data[j * width + i]);
 }
 GrayBMP& GrayBMP::operator=(const GrayBMP& Input)
 {
     SetSize(Input.getWidth(), Input.getHeight());
-    for (int i = 0; i < width; ++i)
+
+    for (int j = 0; j < height; ++j)
     {
-        for (int j = 0; j < height; ++j)
+        for (int i = 0; i < width; ++i)
         {
-            data[i * height + j] = Input(i, j);
+            data[j * width + i] = Input(i, j);
         }
     }
+
     return *this;
 }
 
@@ -76,11 +101,12 @@ GrayBMP GrayBMP::operator-(const GrayBMP& Input)
         printf("width and height must  agree\n");
         return result;
     }
-    for (int i = 0; i < width; ++i)
+
+    for (int j = 0; j < height; ++j)
     {
-        for (int j = 0; j < height; ++j)
+        for (int i = 0; i < width; ++i)
         {
-            result(i, j) = Limit::GrayByte(data[i * height + j] - Input(i, j));
+            result(i, j) = Limit::GrayByte(data[j * width + i] - Input(i, j));
         }
     }
     return result;
@@ -111,11 +137,12 @@ GrayBMP::GrayBMP(GrayBMP& Input)
 {
     data = NULL;
     SetSize(Input.getWidth(), Input.getHeight());
-    for (int i = 0; i < width; ++i)
+
+    for (int j = 0; j < height; ++j)
     {
-        for (int j = 0; j < height; ++j)
+        for (int i = 0; i < width; ++i)
         {
-            data[i * height + j] = Input(i, j);
+            data[j * width + i] = Input(i, j);
         }
     }
 }
@@ -128,6 +155,8 @@ void GrayBMP::Dispose()
     delete[] data;
     data = NULL;
 }
+
+
 GrayBMP::~GrayBMP()
 {
     Dispose();

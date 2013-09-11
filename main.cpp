@@ -9,6 +9,7 @@
 #include "inc/Draw.h"
 #include "inc/Structure/Rect.h"
 #include "inc/Detector.h"
+#include "stdlib.h"
 
 void printVec(Vector<Byte> &v)
 {
@@ -65,20 +66,23 @@ void testDiff()
     GrayBMP gaussian(gray);
 
     // printBMP(gray);
+    int t[] =
+    { 1, 4, 6, 4, 1 };
     GaussianModel model(3, 1.5);
+    int begin = clock() / 1000, end;
+    //for (int i = 0; i < 100; i++)
     Filter::Gaussian(gray, gaussian, model);
-    int color = 255;
-    draw::Circle(gaussian, 200, 200, 40, color);
-    draw::LineOffset(gaussian, 300, 200, 0, 100, color);
-    draw::LineOffset(gaussian, 300, 200, 100, 0, color);
-    draw::LineOffset(gaussian, 300, 200, 100, 100, color);
-    draw::LineOffset(gaussian, 300, 200, 0, -100, color);
-    draw::LineOffset(gaussian, 300, 200, -100, 0, color);
-    draw::LineOffset(gaussian, 300, 200, 100, -100, color);
-    draw::Cross(gaussian, 200, 200, 5, color);
-    draw::Cross(gaussian, 200, 400, 5, color);
-    draw::Cross(gaussian, 400, 200, 5, color);
-    draw::Cross(gaussian, 400, 400, 5, color);
+    end = clock() / 1000;
+    printf("Style1: %d\n", end - begin);
+    ImgIO::WriteToFile(gaussian, "gau1.bmp");
+    begin = clock() / 1000;
+    //for (int i = 0; i < 100; i++)
+    Filter::Conv(gray, gaussian, t, 5);
+    end = clock() / 1000;
+    printf("Style2: %d\n", end - begin);
+
+    ImgIO::WriteToFile(gaussian, "gau2.bmp");
+
 //	WriteToFile(gaussian, "Filter_Gaussian.bmp");
     ImgProcess::Dx(gaussian, test);
     // printBMP(test);
@@ -116,14 +120,14 @@ void testGaussian()
 void testOpticalFlow()
 {
     GrayBMP gray1, gray2, grayBig1, grayBig2;
-    ImgIO::ReadFromFile("img/bmp/cap007.bmp", grayBig1);
-    ImgIO::ReadFromFile("img/bmp/cap008.bmp", grayBig2);
+    ImgIO::ReadFromFile("img/table1.bmp", grayBig1);
+    ImgIO::ReadFromFile("img/table2.bmp", grayBig2);
     int scale = 2;
     GaussianModel gSmooth(3, 0.5);
     ImgProcess::DownSampling(grayBig1, gray1, scale);
     ImgProcess::DownSampling(grayBig2, gray2, scale);
-    ImgIO::WriteToFile(grayBig1,"grayBig1.bmp");
-    ImgIO::WriteToFile(gray1,"gray1.bmp");
+    ImgIO::WriteToFile(grayBig1, "grayBig1.bmp");
+    ImgIO::WriteToFile(gray1, "gray1.bmp");
     Filter::Gaussian_Applyto(gray1, gSmooth);
     Filter::Gaussian_Applyto(gray2, gSmooth);
     int width = gray1.getWidth();
@@ -149,7 +153,7 @@ void testOpticalFlow()
             Iyt(i, j) = iy * it;
         }
     }
-    GaussianModel gCov(5, 1);
+    GaussianModel gCov(15, 1);
     Filter::Gaussian_Applyto(Ixx, gCov);
     Filter::Gaussian_Applyto(Ixy, gCov);
     Filter::Gaussian_Applyto(Iyy, gCov);
@@ -213,34 +217,34 @@ void testScaling()
 
 void testDetect()
 {
-    GrayBMP bmp,gray,patch;
-    char filename[25]="img/bmp/cap000.bmp";
-    ImgIO::ReadFromFile(filename,bmp);
-    ImgProcess::DownSampling(bmp,gray,2);
-    Rect rect(15,194,40,40);
-    ImgProcess::GetSquare(gray,patch,rect);
-    ImgIO::WriteToFile(patch,"Patch.bmp");
+    GrayBMP bmp, gray, patch;
+    char filename[25] = "img/bmp/cap000.bmp";
+    ImgIO::ReadFromFile(filename, bmp);
+    ImgProcess::DownSampling(bmp, gray, 2);
+    Rect rect(15, 194, 40, 40);
+    ImgProcess::GetSquare(gray, patch, rect);
+    ImgIO::WriteToFile(patch, "Patch.bmp");
     Detector detector(patch);
-    for(int i=1;i<101;i++)
+    for (int i = 1; i < 101; i++)
     {
-        sprintf(filename,"img/bmp/cap%03d.bmp",i);
-        ImgIO::ReadFromFile(filename,bmp);
-        ImgProcess::DownSampling(bmp,gray,2);
-        rect=detector.MatchPatch(gray);
-        draw::Rectangle(gray,rect,255);
-        sprintf(filename,"img/out/cap%03d.bmp",i);
-        ImgIO::WriteToFile(gray,filename);
+        sprintf(filename, "img/bmp/cap%03d.bmp", i);
+        ImgIO::ReadFromFile(filename, bmp);
+        ImgProcess::DownSampling(bmp, gray, 2);
+        rect = detector.MatchPatch(gray);
+        draw::Rectangle(gray, rect, 255);
+        sprintf(filename, "img/out/cap%03d.bmp", i);
+        ImgIO::WriteToFile(gray, filename);
     }
 }
 int main()
 {
     // testGaussian();
     // testMatrix();
-    // testDiff();
+    testDiff();
 //    testScaling();
 //    testOpticalFlow();
-    testDetect();
+//    testDetect();
     // testVector();
-    // testOpticalFlow();
+//     testOpticalFlow();
     return 0;
 }

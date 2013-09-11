@@ -41,5 +41,7 @@ class Filter
         static void Gaussian(const GrayBMP &src, GrayBMP &dst,
                 const GaussianModel& gaussian);
         static void Median(const GrayBMP &src, GrayBMP &dst, int Range);
+
+        static void Conv(const GrayBMP &src, GrayBMP &dst, int Filter[], int length);
 };
 #endif
