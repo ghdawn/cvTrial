@@ -10,9 +10,9 @@ void ImgProcess::Dx(const GrayBMP &src, GrayBMP &dx)
     {
         dx.SetSize(src.getWidth(), src.getHeight());
     }
-    for (int i = 0; i < src.getWidth(); ++i)
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j < src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); ++i)
         {
             if ((i == 0) || (j == 0) || (i == (src.getWidth() - 1))
                     || (j == (src.getHeight() - 1)))
@@ -38,9 +38,9 @@ void ImgProcess::Dy(const GrayBMP &src, GrayBMP &dy)
     {
         dy.SetSize(src.getWidth(), src.getHeight());
     }
-    for (int i = 0; i < src.getWidth(); ++i)
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j < src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); ++i)
         {
             if ((i == 0) || (j == 0) || (i == (src.getWidth() - 1))
                     || (j == (src.getHeight() - 1)))
@@ -65,9 +65,9 @@ void ImgProcess::Sobel(const GrayBMP &src, GrayBMP &result)
     {
         result.SetSize(src.getWidth(), src.getHeight());
     }
-    for (int i = 0; i < src.getWidth(); ++i)
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j < src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); ++i)
         {
             if ((i == 0) || (j == 0) || (i == (src.getWidth() - 1))
                     || (j == (src.getHeight() - 1)))
@@ -94,9 +94,9 @@ void ImgProcess::DownSampling(const GrayBMP & src, GrayBMP& dst, int scale)
     {
         dst.SetSize(src.getWidth() / scale, src.getHeight() / scale);
     }
-    for (int i = 0; i < dst.getWidth(); ++i)
+    for (int j = 0; j < dst.getHeight(); ++j)
     {
-        for (int j = 0; j < dst.getHeight(); ++j)
+        for (int i = 0; i < dst.getWidth(); ++i)
         {
             dst(i, j) = src(i * scale, j * scale);
         }
@@ -114,8 +114,9 @@ void ImgProcess::Scaling(const GrayBMP& src, GrayBMP& dst)
     int x0, y0, x1, y1;
     int u, v, u_1, v_1;
     int result;
-    for (int i = 0; i < width; i++)
-        for (int j = 0; j < height; j++)
+    for (int j = 0; j < height; ++j)
+    {
+        for (int i = 0; i < width; ++i)
         {
             x = i * fw;
             y = j * fh;
@@ -129,6 +130,7 @@ void ImgProcess::Scaling(const GrayBMP& src, GrayBMP& dst)
                     + (src(x0, y0 + 1) * u_1 + src(x0 + 1, y0 + 1) * u) * v;
             dst(i, j) = result >> BITS;
         }
+    }
 }
 
 Vector<float> ImgProcess::GetSquare(const GrayBMP& src, int x, int y, int Range)
@@ -136,10 +138,11 @@ Vector<float> ImgProcess::GetSquare(const GrayBMP& src, int x, int y, int Range)
     Vector<float> vec(Range * Range);
     int k = 0;
     Range /= 2;
-    for (int i = x - Range; i <= x + Range; ++i)
+    for (int j = y - Range; j <= y + Range; ++j)
     {
-        for (int j = y - Range; j <= y + Range; ++j)
+        for (int i = x - Range; i <= x + Range; ++i)
         {
+
             vec[k++] = src(i, j);
         }
     }
@@ -150,9 +153,9 @@ Vector<float> ImgProcess::toVector(const GrayBMP& src)
 {
     Vector<float> vec(src.getWidth() * src.getHeight());
     int k = 0;
-    for (int i = 0; i <src.getWidth(); ++i)
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j <src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); ++i)
         {
             vec[k++] = src(i, j);
         }
@@ -168,10 +171,11 @@ void ImgProcess::GetSquare(const GrayBMP& src, GrayBMP& dst, Rect rect)
     }
     int width = rect.getWidth();
     int height = rect.getHeight();
-    for (int i = 0; i < width; ++i)
+    for (int j = 0; j < height; ++j)
     {
-        for (int j = 0; j < height; ++j)
+        for (int i = 0; i < width; ++i)
         {
+
             dst(i, j) = src(i + rect.getX(), j + rect.getY());
         }
     }

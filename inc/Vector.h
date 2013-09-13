@@ -80,7 +80,7 @@ template<typename T>
 Vector<T>::Vector(int dim, T* Data)
 {
     _dim = dim;
-    data = new T[dim];
+    data = new T[dim]();
     if (Data != NULL)
     {
         for (int i = 0; i < _dim; ++i)
@@ -110,7 +110,7 @@ void Vector<T>::allocate(int dim)
 {
     Dispose();
     _dim = dim;
-    data = new T[dim];
+    data = new T[dim]();
     memset(data, 0, _dim);
 }
 template<typename T>
@@ -118,7 +118,7 @@ void Vector<T>::allocate(const Vector<T>& vec)
 {
     Dispose();
     _dim = vec.dim();
-    data = new T[_dim];
+    data = new T[_dim]();
     for (int i = 0; i < _dim; ++i)
     {
         data[i] = vec[i];

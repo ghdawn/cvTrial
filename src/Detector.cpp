@@ -25,13 +25,13 @@ Rect Detector::MatchPatch(const GrayBMP& src)
     float best = 999999999, now;
     Rect result;
     result.setSize(rect.getWidth(), rect.getHeight());
-    for (int i = 0; i < src.getWidth()-rect.getWidth(); ++i)
-        for (int j = 0; j < src.getHeight()-rect.getHeight(); ++j)
+    for (int j = 0; j < src.getHeight() - rect.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth() - rect.getWidth(); ++i)
         {
             rect.setPosition(i, j);
             ImgProcess::GetSquare(src, box, rect);
-            vbox = ImgProcess::toVector(box)-vpatch;
-            now=vbox.norm1();
+            vbox = ImgProcess::toVector(box) - vpatch;
+            now = vbox.norm1();
             if (now < best)
             {
                 best = now;

@@ -19,10 +19,11 @@ void ImgIO::ReadFromFile(const char* filename, GrayBMP& dst)
 void ImgIO::ConvertToGray(BMP &src, GrayBMP &dst)
 {
     // convert each pixel to grayscale using RGB->YUV
-    for (int i = 0; i < src.TellWidth(); i++)
+    for (int j = 0; j < src.TellHeight(); ++j)
     {
-        for (int j = 0; j < src.TellHeight(); ++j)
+        for (int i = 0; i < src.TellWidth(); ++i)
         {
+
             int Temp = (int) floor(
                     0.299 * src(i, j)->Red + 0.587 * src(i, j)->Green
                             + 0.114 * src(i, j)->Blue);
@@ -37,9 +38,9 @@ void ImgIO::WriteToFile(const GrayBMP &src, const char* filename)
     temp.SetSize(src.getWidth(), src.getHeight());
     temp.SetBitDepth(8);
 
-    for (int i = 0; i < src.getWidth(); i++)
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j < src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); i++)
         {
 
             temp(i, j)->Red = src(i, j);

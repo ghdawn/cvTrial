@@ -116,7 +116,7 @@ void GrayBMP::SetSize(int Width, int Height)
     Dispose();
     width = Width;
     height = Height;
-    data = new int[width * height];
+    data = new int[width * height]();
 
 }
 
@@ -124,7 +124,7 @@ GrayBMP::GrayBMP()
 {
     width = 1;
     height = 1;
-    data = new int[1];
+    data = new int[1]();
 
 }
 

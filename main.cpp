@@ -8,7 +8,9 @@
 #include "inc/Matrix.h"
 #include "inc/Draw.h"
 #include "inc/Structure/Rect.h"
+#include "inc/Structure/BasicStruct.h"
 #include "inc/Detector.h"
+#include "inc/OpticalFlow.h"
 #include "stdlib.h"
 
 void printVec(Vector<Byte> &v)
@@ -117,6 +119,42 @@ void testGaussian()
     getchar();
 }
 
+void testLKPy()
+{
+    GrayBMP gray1, gray2, grayBig1, grayBig2;
+    ImgIO::ReadFromFile("img/table1.bmp", grayBig1);
+    ImgIO::ReadFromFile("img/table2.bmp", grayBig2);
+    int scale = 2;
+
+    ImgProcess::DownSampling(grayBig1, gray1, scale);
+    ImgProcess::DownSampling(grayBig2, gray2, scale);
+    int t[] =
+    { 1, 4, 6, 4, 1 };
+    Filter::ConvApplyto(gray1, t, 5);
+    Filter::ConvApplyto(gray2, t, 5);
+    ImgIO::WriteToFile(gray2, "gray2.bmp");
+    ImgIO::WriteToFile(gray1, "gray1.bmp");
+
+    OpticalFlow flow;
+
+    int width = gray1.getWidth();
+    int height = gray1.getHeight();
+//    GrayBMP u(width, height), v(width, height);
+//    Rect r(0, 0, width, height);
+//    flow.LKMethod(gray1, gray2, u, v, r);
+    Point u, v;
+    flow.Init(gray1, gray2);
+    for (int j = 10; j < height; ++j)
+    {
+        for (int i = 10; i < width; ++i)
+        {
+            u.x=i;
+            u.y=j;
+            flow.Compute(u, v);
+        }
+    }
+    printf("%d %d\n", v.x, v.y);
+}
 void testOpticalFlow()
 {
     GrayBMP gray1, gray2, grayBig1, grayBig2;
@@ -126,10 +164,11 @@ void testOpticalFlow()
     GaussianModel gSmooth(3, 0.5);
     ImgProcess::DownSampling(grayBig1, gray1, scale);
     ImgProcess::DownSampling(grayBig2, gray2, scale);
+    Filter::GaussianApplyto(gray1, gSmooth);
+    Filter::GaussianApplyto(gray2, gSmooth);
     ImgIO::WriteToFile(grayBig1, "grayBig1.bmp");
     ImgIO::WriteToFile(gray1, "gray1.bmp");
-    Filter::Gaussian_Applyto(gray1, gSmooth);
-    Filter::Gaussian_Applyto(gray2, gSmooth);
+
     int width = gray1.getWidth();
     int height = gray1.getHeight();
     GrayBMP dx(width, height), dy(width, height), dt(width, height);
@@ -143,9 +182,9 @@ void testOpticalFlow()
     {
         for (int j = 0; j < height; ++j)
         {
-            const float ix = dx(i, j);
-            const float iy = dy(i, j);
-            const float it = dt(i, j);
+            const int ix = dx(i, j);
+            const int iy = dy(i, j);
+            const int it = dt(i, j);
             Ixx(i, j) = ix * ix;
             Iyy(i, j) = iy * iy;
             Ixy(i, j) = ix * iy;
@@ -154,11 +193,11 @@ void testOpticalFlow()
         }
     }
     GaussianModel gCov(15, 1);
-    Filter::Gaussian_Applyto(Ixx, gCov);
-    Filter::Gaussian_Applyto(Ixy, gCov);
-    Filter::Gaussian_Applyto(Iyy, gCov);
-    Filter::Gaussian_Applyto(Ixt, gCov);
-    Filter::Gaussian_Applyto(Iyt, gCov);
+    Filter::GaussianApplyto(Ixx, gCov);
+    Filter::GaussianApplyto(Ixy, gCov);
+    Filter::GaussianApplyto(Iyy, gCov);
+    Filter::GaussianApplyto(Ixt, gCov);
+    Filter::GaussianApplyto(Iyt, gCov);
     Vector<float> u(2);
     int range = 3;
     for (int i = 0; i < width; i += range)
@@ -240,9 +279,10 @@ int main()
 {
     // testGaussian();
     // testMatrix();
-    testDiff();
+//    testDiff();
 //    testScaling();
 //    testOpticalFlow();
+    testLKPy();
 //    testDetect();
     // testVector();
 //     testOpticalFlow();

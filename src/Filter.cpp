@@ -8,9 +8,11 @@ void Filter::Gaussian(const GrayBMP &src, GrayBMP &dst,
         const GaussianModel& gaussian)
 {
     float w = 1 / gaussian.gaussian.sum();
-    for (int i = 0; i < src.getWidth(); ++i)
+
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j < src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); ++i)
+
         {
             if (Limit::OutOfRange(i, gaussian.range, 0, src.getWidth() - 1)
                     || Limit::OutOfRange(j, gaussian.range, 0,
@@ -28,6 +30,11 @@ void Filter::Gaussian(const GrayBMP &src, GrayBMP &dst,
     }
 }
 
+void Filter::ConvApplyto(GrayBMP &bmp, int Filter[], int length)
+{
+    GrayBMP src(bmp);
+    Conv(src,bmp,Filter,length);
+}
 void Filter::Conv(const GrayBMP &src, GrayBMP &dst, int Filter[], int length)
 {
     int width = src.getWidth(), height = src.getHeight();
@@ -47,7 +54,7 @@ void Filter::Conv(const GrayBMP &src, GrayBMP &dst, int Filter[], int length)
                 F = F + src(x - i, y) * Filter[R - i]
                         + src(x + i, y) * Filter[R - i];
             }
-            Cache(x, y) = F /sum;
+            Cache(x, y) = F / sum;
         }
     }
 //第二次Y向处理
@@ -61,19 +68,19 @@ void Filter::Conv(const GrayBMP &src, GrayBMP &dst, int Filter[], int length)
                 F = F + Cache(x, y - i) * Filter[R - i]
                         + Cache(x, y + i) * Filter[R - i];
             }
-            dst(x, y) = (int) F/sum;
+            dst(x, y) = (int) F / sum;
         }
     }
 }
 
-void Filter::Gaussian_Applyto(GrayBMP &target, const GaussianModel& gaussian)
+void Filter::GaussianApplyto(GrayBMP &target, const GaussianModel& gaussian)
 {
     GrayBMP src(target);
 
     float w = 1 / gaussian.gaussian.sum();
-    for (int i = 0; i < src.getWidth(); ++i)
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j < src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); ++i)
         {
             if (Limit::OutOfRange(i, gaussian.range, 0, src.getWidth() - 1)
                     || Limit::OutOfRange(j, gaussian.range, 0,
@@ -93,9 +100,9 @@ void Filter::Gaussian_Applyto(GrayBMP &target, const GaussianModel& gaussian)
 
 void Filter::Median(const GrayBMP &src, GrayBMP &dst, int Range)
 {
-    for (int i = 0; i < src.getWidth(); ++i)
+    for (int j = 0; j < src.getHeight(); ++j)
     {
-        for (int j = 0; j < src.getHeight(); ++j)
+        for (int i = 0; i < src.getWidth(); ++i)
         {
             if (Limit::OutOfRange(i, Range, 0, src.getWidth() - 1)
                     || Limit::OutOfRange(j, Range, 0, src.getHeight() - 1))

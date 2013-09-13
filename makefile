@@ -2,7 +2,7 @@
 CC = g++
 Output = bin/
 
-CFLAGS = -g -Iinc/
+CFLAGS = -g -std=c++11 -Iinc/
 
 Obj = Obj/
 objs = $(Obj)GrayBMP.o $(Obj)OpticalFlow.o $(Obj)Draw.o  $(Obj)EasyBMP.o $(Obj)ImgIO.o $(Obj)Filter.o $(Obj)Detector.o  $(Obj)ImageProcess.o $(Obj)main.o
