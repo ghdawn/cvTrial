@@ -144,15 +144,18 @@ void testLKPy()
 //    flow.LKMethod(gray1, gray2, u, v, r);
     Point u, v;
     flow.Init(gray1, gray2);
-    for (int j = 10; j < height; ++j)
+    for (int j = 10; j < height; j+=10)
     {
-        for (int i = 10; i < width; ++i)
+        for (int i = 10; i < width; i+=10)
         {
             u.x=i;
             u.y=j;
             flow.Compute(u, v);
+            v=v-u;
+            draw::LineOffset(gray1,i,j,v.x,v.y,255);
         }
     }
+    ImgIO::WriteToFile(gray1,"of.bmp");
     printf("%d %d\n", v.x, v.y);
 }
 void testOpticalFlow()

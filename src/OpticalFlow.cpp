@@ -12,6 +12,7 @@
 #include "stdio.h"
 #include "Draw.h"
 #include "Vector.h"
+#include "Jacobi.h"
 #include "OpticalFlow.h"
 
 void OpticalFlow::Init(const GrayBMP& It1, const GrayBMP& It2)
@@ -76,27 +77,68 @@ void OpticalFlow::Compute(Point& U, Point& V)
                 yy += Iyy(i, j);
                 xy += Ixy(i, j);
             }
+        JACOBI_MATRIXmatrix;
+        matrix[0][0] = xx;
+        matrix[0][1] = matrix[1][0] = xy;
+        matrix[1][1] = yy;
+        Jacobi jacobi;
+        jacobi.setMatrix(matrix);
         const float det = xx * yy - xy * xy;
         int xt, yt;
+        Vector<float> alpha1, alpha2;
         dt.SetSize(dx.getWidth(), dx.getHeight());
-        do //for (int k = 0; k < 8; k++)
-        {
-            xt = 0, yt = 0;
-            for (int y = uL.y - w; y <= uL.y + w; ++y)
-            {
-                for (int x = uL.x - w; x <= uL.x + w; ++x)
-                {
-                    dt(x, y) = I[L](x, y)
-                            - J[L](x + guess[0] + v[0], y + guess[1] + v[1]);
-                    xt += dt(x, y) * dx(x, y);
-                    yt += dt(x, y) * dy(x, y);
-                }
-            }
-            ita[0] = (xy * yt - yy * xt) / det;
-            ita[1] = (xy * xt - xx * yt) / det;
+        float lambda1 = jacobi.getEigenValue(0), lambda2 = jacobi.getEigenValue(
+                1);
+//        float a = (xx + yy), b = sqrt(Math::Square(xx - yy) + 4 * xy * xy);
+//        lambda1 = a + b;
+//        lambda2 = a - b;
 
-            v = v + ita;
-        } while (ita.norm1() > threshold);
+        for (int k = 0; k < 1; k++)
+        {
+            if (lambda1 < 0.1)
+            {
+                v[0] = v[1] = 0;
+            }
+            else if (lambda1 > 30 * lambda2)
+            {
+                jacobi.getEigenVec(0, alpha1);
+                for (int y = uL.y - w; y <= uL.y + w; ++y)
+                {
+                    for (int x = uL.x - w; x <= uL.x + w; ++x)
+                    {
+                        dt(x, y) = I[L](x, y)
+                                - J[L](x + guess[0] + v[0],
+                                        y + guess[1] + v[1]);
+                        xt += dt(x, y) * dx(x, y);
+                        yt += dt(x, y) * dy(x, y);
+                    }
+                }
+                float n2 = alpha1[0] * xt+alpha1[1*yt];
+                v[0]=n2*alpha1[0]/lambda1;
+                v[1]=n2*alpha1[1]/lambda1;
+            }
+            else
+            {
+                xt = 0, yt = 0;
+                for (int y = uL.y - w; y <= uL.y + w; ++y)
+                {
+                    for (int x = uL.x - w; x <= uL.x + w; ++x)
+                    {
+                        dt(x, y) = I[L](x, y)
+                                - J[L](x + guess[0] + v[0],
+                                        y + guess[1] + v[1]);
+                        xt += dt(x, y) * dx(x, y);
+                        yt += dt(x, y) * dy(x, y);
+                    }
+                }
+                ita[0] = (xy * yt - yy * xt) / det;
+                ita[1] = (xy * xt - xx * yt) / det;
+
+                v = v + ita;
+            }
+        }
+        //while (ita.norm1() > threshold);
+
         guess = (guess + v) * 2;
         sprintf(file, "pyramidal%d.bmp", L);
         ImgIO::WriteToFile(I[L], file);
