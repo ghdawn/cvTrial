@@ -35,8 +35,10 @@ void OpticalFlow::Compute(Point& U, Point& V)
     int width, height;
     const float threshold = 0.05;
     const int w = 5;
-
-    for (int L = 2; L >= 0; --L)
+    JACOBI_ARRAY ja(2);
+    JACOBI_MATRIX matrix;
+    Jacobi jacobi;
+    for (int L = 1; L >= 0; --L)
     {
         width = I[L].getWidth();
         height = J[L].getHeight();
@@ -77,21 +79,25 @@ void OpticalFlow::Compute(Point& U, Point& V)
                 yy += Iyy(i, j);
                 xy += Ixy(i, j);
             }
-        JACOBI_MATRIXmatrix;
-        matrix[0][0] = xx;
-        matrix[0][1] = matrix[1][0] = xy;
-        matrix[1][1] = yy;
-        Jacobi jacobi;
-        jacobi.setMatrix(matrix);
+//        matrix.clear();
+//        ja[0]=xx;
+//        ja[1]=xy;
+//        matrix.push_back(ja);
+//        ja[0]=xy;
+//        ja[1]=yy;
+//        matrix.push_back(ja);
+//
+//        jacobi.setMatrix(matrix);
+//        jacobi.printEigen();
         const float det = xx * yy - xy * xy;
         int xt, yt;
-        Vector<float> alpha1, alpha2;
+//        Vector<float> alpha1, alpha2;
         dt.SetSize(dx.getWidth(), dx.getHeight());
-        float lambda1 = jacobi.getEigenValue(0), lambda2 = jacobi.getEigenValue(
-                1);
-//        float a = (xx + yy), b = sqrt(Math::Square(xx - yy) + 4 * xy * xy);
-//        lambda1 = a + b;
-//        lambda2 = a - b;
+//        float lambda1 = jacobi.getEigenValue(0), lambda2 = jacobi.getEigenValue(1);
+        float lambda1,lambda2;
+        float a = (xx + yy), b = sqrt(Math::Square(xx - yy) + 4 * xy * xy);
+        lambda1 = a + b;
+        lambda2 = a - b;
 
         for (int k = 0; k < 1; k++)
         {
@@ -101,7 +107,7 @@ void OpticalFlow::Compute(Point& U, Point& V)
             }
             else if (lambda1 > 30 * lambda2)
             {
-                jacobi.getEigenVec(0, alpha1);
+                /*jacobi.getEigenVec(0, alpha1);
                 for (int y = uL.y - w; y <= uL.y + w; ++y)
                 {
                     for (int x = uL.x - w; x <= uL.x + w; ++x)
@@ -113,9 +119,10 @@ void OpticalFlow::Compute(Point& U, Point& V)
                         yt += dt(x, y) * dy(x, y);
                     }
                 }
-                float n2 = alpha1[0] * xt+alpha1[1*yt];
+                float n2 = alpha1[0] * xt+alpha1[1]*yt;
                 v[0]=n2*alpha1[0]/lambda1;
-                v[1]=n2*alpha1[1]/lambda1;
+                v[1]=n2*alpha1[1]/lambda1;*/
+                v[0]=v[1]=0;
             }
             else
             {
@@ -135,13 +142,17 @@ void OpticalFlow::Compute(Point& U, Point& V)
                 ita[1] = (xy * xt - xx * yt) / det;
 
                 v = v + ita;
+                if(v.norm1()>300)
+                {
+                    v[0]=v[1]=0;
+                }
             }
         }
         //while (ita.norm1() > threshold);
 
         guess = (guess + v) * 2;
-        sprintf(file, "pyramidal%d.bmp", L);
-        ImgIO::WriteToFile(I[L], file);
+//        sprintf(file, "pyramidal%d.bmp", L);
+//        ImgIO::WriteToFile(I[L], file);
     }
     V.x = U.x + guess[0] * 0.5;
     V.y = U.y + guess[1] * 0.5;
@@ -161,7 +172,7 @@ void OpticalFlow::GeneratePyramidal(const GrayBMP& It1, const GrayBMP& It2)
     height[0] = It1.getHeight();
     I[0] = It1;
     J[0] = It2;
-    for (int L = 1; L < 3; L++)
+    for (int L = 1; L < 2; L++)
     {
         width[L] = width[L - 1] >> 1;
         height[L] = height[L - 1] >> 1;

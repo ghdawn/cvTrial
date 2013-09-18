@@ -41,8 +41,7 @@ int& GrayBMP::operator()(int i, int j)
     }
     if (Warn)
     {
-        printf("Warning: Attempted to access non-existent pixel:(%d,%d)\n", i,
-                j);
+       // printf("Warning: Attempted to access non-existent pixel:(%d,%d)\n", i, j);
     }
     return (data[j * width + i]);
 }
@@ -72,8 +71,7 @@ int GrayBMP::operator()(int i, int j) const
     }
     if (Warn)
     {
-        printf("Warning: Attempted to access non-existent pixel:(%d,%d)\n", i,
-                j);
+        //printf("Warning: Attempted to access non-existent pixel:(%d,%d)\n", i,j);
         return 0;
     }
     return (data[j * width + i]);

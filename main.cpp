@@ -10,8 +10,12 @@
 #include "inc/Structure/Rect.h"
 #include "inc/Structure/BasicStruct.h"
 #include "inc/Detector.h"
+#include "inc/Jacobi.h"
 #include "inc/OpticalFlow.h"
 #include "stdlib.h"
+#include <iostream>
+using std::cout;
+using std::endl;
 
 void printVec(Vector<Byte> &v)
 {
@@ -119,11 +123,41 @@ void testGaussian()
     getchar();
 }
 
+void testEigen()
+{
+    JACOBI_ARRAY ja(3), value;
+    JACOBI_MATRIX jm, vector;
+    for (int i = 0; i < 100; ++i)
+    {
+        jm.clear();
+        ja[0] = 1;
+        ja[1] = -1;
+        ja[2] = 0;
+        jm.push_back(ja);
+        ja[0] = -1;
+        ja[1] = 1;
+        ja[2] = 2;
+        jm.push_back(ja);
+        ja[0] = 0;
+        ja[1] = 2;
+        ja[0] = 1;
+        jm.push_back(ja);
+        Jacobi j;
+        j.setMatrix(jm);
+        value = j.getEigenvalues();
+        vector = j.getEigenvectors();
+        j.printEigen();
+    }
+}
 void testLKPy()
 {
     GrayBMP gray1, gray2, grayBig1, grayBig2;
-    ImgIO::ReadFromFile("img/table1.bmp", grayBig1);
-    ImgIO::ReadFromFile("img/table2.bmp", grayBig2);
+    char infile[25]="img/black/cap000.bmp";
+    char outfile[25]="img/out/cap000.bmp";
+    ImgIO::ReadFromFile("img/black/cap000.bmp", grayBig1);
+    ImgIO::ReadFromFile("img/black/cap001.bmp", grayBig2);
+//    ImgIO::ReadFromFile("img/table1.bmp", grayBig1);
+//    ImgIO::ReadFromFile("img/table2.bmp", grayBig2);
     int scale = 2;
 
     ImgProcess::DownSampling(grayBig1, gray1, scale);
@@ -137,26 +171,49 @@ void testLKPy()
 
     OpticalFlow flow;
 
-    int width = gray1.getWidth();
-    int height = gray1.getHeight();
-//    GrayBMP u(width, height), v(width, height);
-//    Rect r(0, 0, width, height);
-//    flow.LKMethod(gray1, gray2, u, v, r);
-    Point u, v;
+    Point u, v, final;
+    final.x = final.y = 0;
     flow.Init(gray1, gray2);
-    for (int j = 10; j < height; j+=10)
+    Rect rect(25, 180,50, 50);
+    gray2=gray1;
+    int count;
+    for (int k = 30; k < 100; ++k)
     {
-        for (int i = 10; i < width; i+=10)
+        gray1=gray2;
+        sprintf(infile,"img/black/cap%03d.bmp",k+1);
+        ImgIO::ReadFromFile(infile, grayBig2);
+        ImgProcess::DownSampling(grayBig2, gray2, scale);
+        Filter::ConvApplyto(gray2, t, 5);
+        int begin=clock()/1000;
+        int x=rect.getX();
+        int y=rect.getY();
+        int upx=x+rect.getWidth();
+        int upy=y+rect.getHeight();
+        final.x = final.y = 0;
+        count=0;
+        for (int j = y; j < upy; j += 4)
         {
-            u.x=i;
-            u.y=j;
-            flow.Compute(u, v);
-            v=v-u;
-            draw::LineOffset(gray1,i,j,v.x,v.y,255);
+            for (int i = x; i < upx; i += 4)
+            {
+                u.x = i;
+                u.y = j;
+                flow.Compute(u, v);
+                v = v - u;
+                final = final + v;
+                ++count;
+                draw::LineOffset(gray1, i, j, v.x, v.y, 255);
+            }
         }
+        rect.setPosition(rect.getX()-final.x/count,rect.getY()-final.y/count);
+        printf("%d %d\n",rect.getX(),rect.getY());
+
+        draw::Rectangle(gray1,rect,255);
+        sprintf(outfile,"img/out/cap%03d.bmp",k);
+        ImgIO::WriteToFile(gray1, outfile);
+        int end=clock()/1000;
+        printf("time:%d\n",end-begin);
+        cout<<endl;
     }
-    ImgIO::WriteToFile(gray1,"of.bmp");
-    printf("%d %d\n", v.x, v.y);
 }
 void testOpticalFlow()
 {
@@ -286,6 +343,7 @@ int main()
 //    testScaling();
 //    testOpticalFlow();
     testLKPy();
+//    testEigen();
 //    testDetect();
     // testVector();
 //     testOpticalFlow();
