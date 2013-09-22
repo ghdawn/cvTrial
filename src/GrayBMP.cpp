@@ -69,11 +69,11 @@ int GrayBMP::operator()(int i, int j) const
         Warn = true;
         j = 0;
     }
-    if (Warn)
+    /*if (Warn)
     {
-        //printf("Warning: Attempted to access non-existent pixel:(%d,%d)\n", i,j);
+        printf("Warning: Attempted to access non-existent pixel:(%d,%d)\n", i,j);
         return 0;
-    }
+    }*/
     return (data[j * width + i]);
 }
 GrayBMP& GrayBMP::operator=(const GrayBMP& Input)

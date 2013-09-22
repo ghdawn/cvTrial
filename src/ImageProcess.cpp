@@ -26,7 +26,7 @@ void ImgProcess::Dx(const GrayBMP &src, GrayBMP &dx)
                         + (src(i + 1, j + 1) - src(i - 1, j + 1));
                 // int TempBYTE = Limit::Round((src(i + 1, j) - src(i - 1, j)) / 2.0);
                 // int TempBYTE=(src(i+1,j-1)+2*src(i+1,j)+src(i+1,j+1)+(-1)*src(i-1,j-1)+(-2)*src(i-1,j)+(-1)*src(i-1,j+1));
-                dx(i, j) = Limit::GrayByte(TempBYTE / 8);
+                dx(i, j) = Limit::GrayByte(TempBYTE );
             }
         }
     }
@@ -53,7 +53,7 @@ void ImgProcess::Dy(const GrayBMP &src, GrayBMP &dy)
                         + 2 * (src(i, j - 1) - src(i, j + 1))
                         + (src(i + 1, j - 1) - src(i + 1, j + 1));
                 //int TempBYTE = Limit::Round((src(i, j + 1) - src(i, j - 1)) / 2.0);
-                dy(i, j) = Limit::GrayByte(TempBYTE / 8);
+                dy(i, j) = Limit::GrayByte(TempBYTE );
             }
         }
     }
@@ -78,10 +78,10 @@ void ImgProcess::Sobel(const GrayBMP &src, GrayBMP &result)
             {
                 int dx = (src(i + 1, j - 1) - src(i - 1, j - 1))
                         + 2 * (src(i + 1, j) - src(i - 1, j))
-                        + (src(i + 1, j + 1) - src(i - 1, j + 1)) / 8;
+                        + (src(i + 1, j + 1) - src(i - 1, j + 1)) ;
                 int dy = (src(i - 1, j - 1) - src(i - 1, j + 1))
                         + 2 * (src(i, j - 1) - src(i, j + 1))
-                        + (src(i + 1, j - 1) - src(i + 1, j + 1)) / 8;
+                        + (src(i + 1, j - 1) - src(i + 1, j + 1));
                 result(i, j) = Limit::GrayByte(Math::Abs(dx) + Math::Abs(dy));
             }
         }

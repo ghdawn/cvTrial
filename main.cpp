@@ -152,12 +152,11 @@ void testEigen()
 void testLKPy()
 {
     GrayBMP gray1, gray2, grayBig1, grayBig2;
-    char infile[25]="img/black/cap000.bmp";
-    char outfile[25]="img/out/cap000.bmp";
-    ImgIO::ReadFromFile("img/black/cap000.bmp", grayBig1);
-    ImgIO::ReadFromFile("img/black/cap001.bmp", grayBig2);
-//    ImgIO::ReadFromFile("img/table1.bmp", grayBig1);
-//    ImgIO::ReadFromFile("img/table2.bmp", grayBig2);
+    char infile[25] = "img/green/cap000.bmp";
+    char outfile[25] = "img/out/cap000.bmp";
+    ImgIO::ReadFromFile("img/green/cap000.bmp", grayBig1);
+    ImgIO::ReadFromFile("img/table1.bmp", grayBig1);
+    ImgIO::ReadFromFile("img/table2.bmp", grayBig2);
     int scale = 2;
 
     ImgProcess::DownSampling(grayBig1, gray1, scale);
@@ -165,32 +164,30 @@ void testLKPy()
     int t[] =
     { 1, 4, 6, 4, 1 };
     Filter::ConvApplyto(gray1, t, 5);
-    Filter::ConvApplyto(gray2, t, 5);
-    ImgIO::WriteToFile(gray2, "gray2.bmp");
-    ImgIO::WriteToFile(gray1, "gray1.bmp");
-
     OpticalFlow flow;
 
     Point u, v, final;
     final.x = final.y = 0;
-    flow.Init(gray1, gray2);
-    Rect rect(25, 180,50, 50);
-    gray2=gray1;
-    int count;
-    for (int k = 30; k < 100; ++k)
+    //flow.Init(gray1, gray2);
+//    Rect rect(20, 180,40, 40);
+//    Rect rect(103, 122,60, 60);
+    Rect rect(10, 10, 300, 230);
+    //gray2=gray1;
+    //int count=1;
+    //for (int k = 0; k < 100; ++k)
     {
-        gray1=gray2;
-        sprintf(infile,"img/black/cap%03d.bmp",k+1);
-        ImgIO::ReadFromFile(infile, grayBig2);
-        ImgProcess::DownSampling(grayBig2, gray2, scale);
-        Filter::ConvApplyto(gray2, t, 5);
-        int begin=clock()/1000;
-        int x=rect.getX();
-        int y=rect.getY();
-        int upx=x+rect.getWidth();
-        int upy=y+rect.getHeight();
+        // gray1=gray2;
+//        sprintf(infile,"img/green/cap%03d.bmp",k+1);
+//        ImgIO::ReadFromFile(infile, grayBig2);
+//        ImgProcess::DownSampling(grayBig2, gray2, scale);
+//        Filter::ConvApplyto(gray2, t, 5);
+        int begin = clock() / 1000;
+        int x = rect.getX();
+        int y = rect.getY();
+        int upx = x + rect.getWidth();
+        int upy = y + rect.getHeight();
         final.x = final.y = 0;
-        count=0;
+        flow.Init(gray1, gray2);
         for (int j = y; j < upy; j += 4)
         {
             for (int i = x; i < upx; i += 4)
@@ -199,22 +196,26 @@ void testLKPy()
                 u.y = j;
                 flow.Compute(u, v);
                 v = v - u;
+                printf("(%d,%d)  ", v.x, v.y);
                 final = final + v;
-                ++count;
+//                if(v.x!=0 && v.y!=0)
+//                    ++count;
                 draw::LineOffset(gray1, i, j, v.x, v.y, 255);
             }
         }
-        rect.setPosition(rect.getX()-final.x/count,rect.getY()-final.y/count);
-        printf("%d %d\n",rect.getX(),rect.getY());
+        //rect.setPosition(rect.getX()+final.x/count,rect.getY()+final.y/count);
+        //rect=flow.Compute(rect);
+//        printf("\nNo.%d\n%d %d\n",k,rect.getX(),rect.getY());
 
-        draw::Rectangle(gray1,rect,255);
-        sprintf(outfile,"img/out/cap%03d.bmp",k);
+        draw::Rectangle(gray1, rect, 255);
+//        sprintf(outfile,"img/out/cap%03d.bmp",k);
         ImgIO::WriteToFile(gray1, outfile);
-        int end=clock()/1000;
-        printf("time:%d\n",end-begin);
-        cout<<endl;
+        int end = clock() / 1000;
+        printf("time:%d\n", end - begin);
+        cout << endl;
     }
 }
+
 void testOpticalFlow()
 {
     GrayBMP gray1, gray2, grayBig1, grayBig2;

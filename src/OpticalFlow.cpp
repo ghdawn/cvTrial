@@ -18,152 +18,200 @@
 void OpticalFlow::Init(const GrayBMP& It1, const GrayBMP& It2)
 {
     GeneratePyramidal(It1, It2);
+//    char infile[25] = "img/green/cap000.bmp";
+    for (int L = 0; L < level; ++L)
+    {
+        ImgProcess::Dx(I[L], dx[L]);
+        ImgProcess::Dy(I[L], dy[L]);
+//        sprintf(infile, "dx%d.bmp", L);
+//        ImgIO::WriteToFile(dy[L], infile);
+//        sprintf(infile, "gray%d.bmp", L);
+//        ImgIO::WriteToFile(I[L], infile);
+        ixx[L].SetSize(width[L], height[L]);
+        ixy[L].SetSize(width[L], height[L]);
+        iyy[L].SetSize(width[L], height[L]);
+    }
 }
 
+int OpticalFlow::Ixx(int L, int x, int y)
+{
+    if (ixx[L](x, y) > 0)
+        return ixx[L](x, y);
+    else
+    {
+        ixx[L](x, y) = dx[L](x, y) * dx[L](x, y);
+        return ixx[L](x, y);
+    }
+}
+
+int OpticalFlow::Ixy(int L, int x, int y)
+{
+    if (ixy[L](x, y) > 0)
+        return ixy[L](x, y);
+    else
+    {
+        ixy[L](x, y) = dx[L](x, y) * dy[L](x, y);
+        return ixy[L](x, y);
+    }
+}
+
+int OpticalFlow::Iyy(int L, int x, int y)
+{
+    if (iyy[L](x, y) > 0)
+        return iyy[L](x, y);
+    else
+    {
+        iyy[L](x, y) = dy[L](x, y) * dy[L](x, y);
+        return iyy[L](x, y);
+    }
+}
 void OpticalFlow::Compute(Point& U, Point& V)
 {
-    char file[20];
     //每一层猜测的光流大小
     Vector<float> guess(2);
     Vector<float> v(2), ita(2);
     //每一层的三个微分
-    GrayBMP dx, dy, dt;
-    //三个微分对应的乘积
-    GrayBMP Ixx, Iyy, Ixy, Ixt, Iyt;
+    GrayBMP dt;
     //每层待计算的点
     Point uL;
-    int width, height;
-    const float threshold = 0.05;
     const int w = 5;
     JACOBI_ARRAY ja(2);
-    JACOBI_MATRIX matrix;
-    Jacobi jacobi;
-    for (int L = 1; L >= 0; --L)
+    JACOBI_MATRIX mat(2);
+    for (int L = level - 1; L >= 0; --L)
     {
-        width = I[L].getWidth();
-        height = J[L].getHeight();
-
+        if (L < (level - 1))
+        {
+            guess = (guess + v) * 2;
+        }
         uL.x = U.x >> L;
         uL.y = U.y >> L;
-        ImgProcess::Dx(I[L], dx);
-        ImgProcess::Dy(I[L], dy);
-        Ixx.SetSize(width, height);
-        Iyy.SetSize(width, height);
-        Ixy.SetSize(width, height);
-        Ixt.SetSize(width, height);
-        Iyt.SetSize(width, height);
-        for (int j = 0; j < height; ++j)
-        {
-            for (int i = 0; i < width; ++i)
-            {
-                const int ix = dx(i, j);
-                const int iy = dy(i, j);
-                Ixx(i, j) = ix * ix;
-                Iyy(i, j) = iy * iy;
-                Ixy(i, j) = ix * iy;
-            }
-        }
 
         v[0] = v[1] = 0;
 
         int xx = 0, yy = 0, xy = 0;
         for (int j = uL.y - w; j <= uL.y + w; ++j)
+        {
             for (int i = uL.x - w; i <= uL.x + w; ++i)
             {
-                const int ix = dx(i, j);
-                const int iy = dy(i, j);
-                Ixx(i, j) = ix * ix;
-                Iyy(i, j) = iy * iy;
-                Ixy(i, j) = ix * iy;
-                xx += Ixx(i, j);
-                yy += Iyy(i, j);
-                xy += Ixy(i, j);
+                xx += Ixx(L, i, j);
+                yy += Iyy(L, i, j);
+                xy += Ixy(L, i, j);
             }
-//        matrix.clear();
-//        ja[0]=xx;
-//        ja[1]=xy;
-//        matrix.push_back(ja);
-//        ja[0]=xy;
-//        ja[1]=yy;
-//        matrix.push_back(ja);
-//
-//        jacobi.setMatrix(matrix);
-//        jacobi.printEigen();
-        const float det = xx * yy - xy * xy;
-        int xt, yt;
-//        Vector<float> alpha1, alpha2;
-        dt.SetSize(dx.getWidth(), dx.getHeight());
-//        float lambda1 = jacobi.getEigenValue(0), lambda2 = jacobi.getEigenValue(1);
-        float lambda1,lambda2;
-        float a = (xx + yy), b = sqrt(Math::Square(xx - yy) + 4 * xy * xy);
-        lambda1 = a + b;
-        lambda2 = a - b;
+        }
 
-        for (int k = 0; k < 1; k++)
+        int xt, yt;
+        dt.SetSize(width[L], height[L]);
+        float lambda1, lambda2;
+        ja[0] = xx;
+        ja[1] = xy;
+        mat[0] = ja;
+        ja[0] = xy;
+        ja[1] = yy;
+        mat[1] = ja;
+        Jacobi jacobi;
+        jacobi.setMatrix(mat);
+        Vector<float> eig1, eig0;
+        lambda1 = jacobi.getEigenValue(0);
+        lambda2 = jacobi.getEigenValue(1);
+//        jacobi.printEigen();
+//        jacobi.printMatrix();
+        jacobi.getEigenVec(0, eig0);
+        jacobi.getEigenVec(1, eig1);
+
+        if (lambda1 < 0.1)
         {
-            if (lambda1 < 0.1)
+            v[0] = v[1] = 0;
+        }
+        else if (lambda1 > 100 * lambda2)
+        {
+            xt = 0, yt = 0;
+            for (int y = uL.y - w; y <= uL.y + w; ++y)
             {
-                v[0] = v[1] = 0;
-            }
-            else if (lambda1 > 30 * lambda2)
-            {
-                /*jacobi.getEigenVec(0, alpha1);
-                for (int y = uL.y - w; y <= uL.y + w; ++y)
+                for (int x = uL.x - w; x <= uL.x + w; ++x)
                 {
-                    for (int x = uL.x - w; x <= uL.x + w; ++x)
-                    {
-                        dt(x, y) = I[L](x, y)
-                                - J[L](x + guess[0] + v[0],
-                                        y + guess[1] + v[1]);
-                        xt += dt(x, y) * dx(x, y);
-                        yt += dt(x, y) * dy(x, y);
-                    }
+                    dt(x, y) = J[L](Limit::Round(x + guess[0] + v[0]), Limit::Round(y + guess[1] + v[1]))
+                            - I[L](x, y);
+                    xt += dt(x, y) * dx[L](x, y);
+                    yt += dt(x, y) * dy[L](x, y);
                 }
-                float n2 = alpha1[0] * xt+alpha1[1]*yt;
-                v[0]=n2*alpha1[0]/lambda1;
-                v[1]=n2*alpha1[1]/lambda1;*/
-                v[0]=v[1]=0;
             }
-            else
+            float n1 = eig0[0] * xt + eig0[1] * yt;
+            v[0] = n1 * eig0[0] / lambda1;
+            v[1] = n1 * eig0[1] / lambda1;
+        }
+        else
+        {
+            //for(int k=0;k<3;++k)
             {
                 xt = 0, yt = 0;
                 for (int y = uL.y - w; y <= uL.y + w; ++y)
                 {
                     for (int x = uL.x - w; x <= uL.x + w; ++x)
                     {
-                        dt(x, y) = I[L](x, y)
-                                - J[L](x + guess[0] + v[0],
-                                        y + guess[1] + v[1]);
-                        xt += dt(x, y) * dx(x, y);
-                        yt += dt(x, y) * dy(x, y);
+                        dt(x, y) = J[L](Limit::Round(x + guess[0] + v[0]), Limit::Round(y + guess[1] + v[1]))- I[L](x, y);
+                        xt += dt(x, y) * dx[L](x, y);
+                        yt += dt(x, y) * dy[L](x, y);
                     }
                 }
-                ita[0] = (xy * yt - yy * xt) / det;
-                ita[1] = (xy * xt - xx * yt) / det;
-
+                float n1 = eig0[0] * xt + eig0[1] * yt;
+                float n2 = eig1[0] * xt + eig1[1] * yt;
+                ita[0] = n1 * eig0[0] / lambda1 + n2 * eig1[0] / lambda2;
+                ita[1] = n1 * eig0[1] / lambda1 + n2 * eig1[1] / lambda2;
+//            const float det = xx * yy - xy * xy;
+//            ita[0] = (xy * yt - yy * xt) / det;
+//            ita[1] = (xy * xt - xx * yt) / det;
                 v = v + ita;
-                if(v.norm1()>300)
-                {
-                    v[0]=v[1]=0;
-                }
-            }
+                printf("%f\n", ita.norm2());
+            }// while (ita.norm2() > 0.5);
+            printf("Done at :%f\n", ita.norm2());
         }
-        //while (ita.norm1() > threshold);
-
-        guess = (guess + v) * 2;
-//        sprintf(file, "pyramidal%d.bmp", L);
-//        ImgIO::WriteToFile(I[L], file);
+//        if (v.norm2() > 200)
+//        {
+//            v[0] = v[1] = 0;
+//        }
     }
-    V.x = U.x + guess[0] * 0.5;
-    V.y = U.y + guess[1] * 0.5;
+    V.x = U.x + Limit::Round(guess[0]);
+    V.y = U.y + Limit::Round(guess[1]);
 }
 
-void OpticalFlow::Compute(GrayBMP& u, GrayBMP& v)
+Rect OpticalFlow::Compute(const Rect& rect)
 {
-}
+    Rect rectout(rect);
+    int x = rect.getX();
+    int y = rect.getY();
+    int upx = x + rect.getWidth();
+    int upy = y + rect.getHeight();
+    Point u, v, final;
+    int count = (rect.getHeight() * rect.getWidth()) >> 4;
+    Point *U = new Point[count];
+    Point *V = new Point[count];
+    int k = 0;
+    for (int j = y; j < upy; j += 4)
+    {
+        for (int i = x; i < upx; i += 4)
+        {
+            u.x = i;
+            u.y = j;
+            Compute(u, v);
+            U[k] = u;
+            V[k] = v;
+            v = v - u;
+            final = final + v;
+            ++k;
+        }
+    }
 
-void OpticalFlow::Compute(GrayBMP& u, GrayBMP& v, Rect rect)
-{
+    u.x = u.y = 0;
+    for (int i = 0; i < count; ++i)
+        u = u + V[i];
+    u.x /= count;
+    u.y /= count;
+//    rectout.setPosition(u.x - (rect.getWidth() >> 1),u.y - (rect.getHeight() >> 1));
+    rectout.setPosition(rect.getX() + final.x / count,
+            rect.getY() + final.y / count);
+    delete[] U;
+    delete[] V;
+    return rectout;
 }
 
 void OpticalFlow::GeneratePyramidal(const GrayBMP& It1, const GrayBMP& It2)
@@ -172,7 +220,7 @@ void OpticalFlow::GeneratePyramidal(const GrayBMP& It1, const GrayBMP& It2)
     height[0] = It1.getHeight();
     I[0] = It1;
     J[0] = It2;
-    for (int L = 1; L < 2; L++)
+    for (int L = 1; L < level; L++)
     {
         width[L] = width[L - 1] >> 1;
         height[L] = height[L - 1] >> 1;
@@ -183,3 +231,12 @@ void OpticalFlow::GeneratePyramidal(const GrayBMP& It1, const GrayBMP& It2)
     }
 }
 
+OpticalFlow::OpticalFlow()
+{
+    level = 3;
+}
+
+OpticalFlow::OpticalFlow(int Level)
+{
+    level = Level;
+}
