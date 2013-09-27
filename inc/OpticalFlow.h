@@ -18,7 +18,7 @@ class OpticalFlow
 {
     public:
         void Init(const GrayBMP& It1,const GrayBMP& It2);
-        void Compute(Point& U,Point& V);
+        void Compute(Point& U,Point& V,bool Forward);
         Rect Compute(const Rect& rect);
         int level;
         OpticalFlow();

@@ -65,7 +65,7 @@ int OpticalFlow::Iyy(int L, int x, int y)
         return iyy[L](x, y);
     }
 }
-void OpticalFlow::Compute(Point& U, Point& V)
+void OpticalFlow::Compute(Point& U, Point& V, bool Forward)
 {
     //每一层猜测的光流大小
     Vector<float> guess(2);
@@ -129,8 +129,20 @@ void OpticalFlow::Compute(Point& U, Point& V)
             {
                 for (int x = uL.x - w; x <= uL.x + w; ++x)
                 {
-                    dt(x, y) = J[L](Limit::Round(x + guess[0] + v[0]), Limit::Round(y + guess[1] + v[1]))
-                            - I[L](x, y);
+                    if (Forward)
+                    {
+                        dt(x, y) = I[L](x, y)
+                                - ImgProcess::Interpolation(J[L],
+                                        x + guess[0] + v[0],
+                                        y + guess[1] + v[1]);
+                    }
+                    else
+                    {
+                        dt(x, y) = J[L](x, y)
+                                - ImgProcess::Interpolation(I[L],
+                                        x + guess[0] + v[0],
+                                        y + guess[1] + v[1]);
+                    }
                     xt += dt(x, y) * dx[L](x, y);
                     yt += dt(x, y) * dy[L](x, y);
                 }
@@ -141,14 +153,27 @@ void OpticalFlow::Compute(Point& U, Point& V)
         }
         else
         {
-            //for(int k=0;k<3;++k)
+//            for (int k = 0; k < 3; ++k)
             {
                 xt = 0, yt = 0;
                 for (int y = uL.y - w; y <= uL.y + w; ++y)
                 {
                     for (int x = uL.x - w; x <= uL.x + w; ++x)
                     {
-                        dt(x, y) = J[L](Limit::Round(x + guess[0] + v[0]), Limit::Round(y + guess[1] + v[1]))- I[L](x, y);
+                        if (Forward)
+                        {
+                            dt(x, y) = I[L](x, y)
+                                    - ImgProcess::Interpolation(J[L],
+                                            x + guess[0] + v[0],
+                                            y + guess[1] + v[1]);
+                        }
+                        else
+                        {
+                            dt(x, y) = J[L](x, y)
+                                    - ImgProcess::Interpolation(I[L],
+                                            x + guess[0] + v[0],
+                                            y + guess[1] + v[1]);
+                        }
                         xt += dt(x, y) * dx[L](x, y);
                         yt += dt(x, y) * dy[L](x, y);
                     }
@@ -157,18 +182,14 @@ void OpticalFlow::Compute(Point& U, Point& V)
                 float n2 = eig1[0] * xt + eig1[1] * yt;
                 ita[0] = n1 * eig0[0] / lambda1 + n2 * eig1[0] / lambda2;
                 ita[1] = n1 * eig0[1] / lambda1 + n2 * eig1[1] / lambda2;
-//            const float det = xx * yy - xy * xy;
-//            ita[0] = (xy * yt - yy * xt) / det;
-//            ita[1] = (xy * xt - xx * yt) / det;
+//                const float det = xx * yy - xy * xy;
+//                ita[0] = (xy * yt - yy * xt) / det;
+//                ita[1] = (xy * xt - xx * yt) / det;
                 v = v + ita;
-                printf("%f\n", ita.norm2());
-            }// while (ita.norm2() > 0.5);
-            printf("Done at :%f\n", ita.norm2());
+//                printf("%f\n", ita.norm2());
+            }
+//            printf("Done at :%f\n", ita.norm2());
         }
-//        if (v.norm2() > 200)
-//        {
-//            v[0] = v[1] = 0;
-//        }
     }
     V.x = U.x + Limit::Round(guess[0]);
     V.y = U.y + Limit::Round(guess[1]);
@@ -182,35 +203,71 @@ Rect OpticalFlow::Compute(const Rect& rect)
     int upx = x + rect.getWidth();
     int upy = y + rect.getHeight();
     Point u, v, final;
-    int count = (rect.getHeight() * rect.getWidth()) >> 4;
+    int count = (rect.getHeight() * rect.getWidth()); // >> 2;
     Point *U = new Point[count];
     Point *V = new Point[count];
+    float *error = new float[count];
     int k = 0;
-    for (int j = y; j < upy; j += 4)
+    for (int j = y; j < upy; j += 2)
     {
-        for (int i = x; i < upx; i += 4)
+        for (int i = x; i < upx; i += 2)
         {
             u.x = i;
             u.y = j;
-            Compute(u, v);
+            Compute(u, v, true);
             U[k] = u;
             V[k] = v;
-            v = v - u;
-            final = final + v;
             ++k;
         }
     }
 
     u.x = u.y = 0;
-    for (int i = 0; i < count; ++i)
-        u = u + V[i];
-    u.x /= count;
-    u.y /= count;
+    v.x = v.y = 0;
+    Vector<float> ita(2);
+    for (int i = 0; i < k; ++i)
+    {
+        Compute(V[i], u, false);
+        ita[0] = u.x - U[i].x;
+        ita[1] = u.y - U[i].y;
+        error[i] = ita.norm2();
+    }
+    for (int i = 1; i < k; i++)
+    {
+        if (error[i - 1] > error[i])
+        {
+            float temp = error[i];
+            v = V[i];
+            u = U[i];
+            int j = i;
+            while (j > 0 && error[j - 1] > temp)
+            {
+                error[j] = error[j - 1];
+                V[j] = V[j - 1];
+                U[j] = U[j - 1];
+                j--;
+            }
+            error[j] = temp;
+            U[j] = u;
+            V[j] = v;
+        }
+    }
+    u.x = u.y = 0;
+    v.x = v.y = 0;
+    k = (3*k) >> 2;
+    for (int i = 0; i < k; ++i)
+    {
+        u = u + U[i];
+        v = v + V[i];
+    }
+    u.x /= k;
+    u.y /= k;
+    v.x /= k;
+    v.y /= k;
 //    rectout.setPosition(u.x - (rect.getWidth() >> 1),u.y - (rect.getHeight() >> 1));
-    rectout.setPosition(rect.getX() + final.x / count,
-            rect.getY() + final.y / count);
+    rectout.setPosition(rect.getX() + v.x - u.x, rect.getY() + v.y - u.y);
     delete[] U;
     delete[] V;
+    delete[] error;
     return rectout;
 }
 

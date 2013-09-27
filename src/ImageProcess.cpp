@@ -26,7 +26,7 @@ void ImgProcess::Dx(const GrayBMP &src, GrayBMP &dx)
                         + (src(i + 1, j + 1) - src(i - 1, j + 1));
                 // int TempBYTE = Limit::Round((src(i + 1, j) - src(i - 1, j)) / 2.0);
                 // int TempBYTE=(src(i+1,j-1)+2*src(i+1,j)+src(i+1,j+1)+(-1)*src(i-1,j-1)+(-2)*src(i-1,j)+(-1)*src(i-1,j+1));
-                dx(i, j) = Limit::GrayByte(TempBYTE );
+                dx(i, j) = Limit::GrayByte(TempBYTE >> 3);
             }
         }
     }
@@ -49,11 +49,11 @@ void ImgProcess::Dy(const GrayBMP &src, GrayBMP &dy)
             }
             else
             {
-                int TempBYTE = (src(i - 1, j - 1) - src(i - 1, j + 1))
-                        + 2 * (src(i, j - 1) - src(i, j + 1))
-                        + (src(i + 1, j - 1) - src(i + 1, j + 1));
+                int TempBYTE = (src(i - 1, j + 1) - src(i - 1, j - 1))
+                        + 2 * (src(i, j + 1) - src(i, j - 1))
+                        + (src(i + 1, j + 1) - src(i + 1, j - 1));
                 //int TempBYTE = Limit::Round((src(i, j + 1) - src(i, j - 1)) / 2.0);
-                dy(i, j) = Limit::GrayByte(TempBYTE );
+                dy(i, j) = Limit::GrayByte(TempBYTE >> 3);
             }
         }
     }
@@ -78,10 +78,10 @@ void ImgProcess::Sobel(const GrayBMP &src, GrayBMP &result)
             {
                 int dx = (src(i + 1, j - 1) - src(i - 1, j - 1))
                         + 2 * (src(i + 1, j) - src(i - 1, j))
-                        + (src(i + 1, j + 1) - src(i - 1, j + 1)) ;
-                int dy = (src(i - 1, j - 1) - src(i - 1, j + 1))
-                        + 2 * (src(i, j - 1) - src(i, j + 1))
-                        + (src(i + 1, j - 1) - src(i + 1, j + 1));
+                        + (src(i + 1, j + 1) - src(i - 1, j + 1));
+                int dy = (src(i - 1, j + 1) - src(i - 1, j - 1))
+                        + 2 * (src(i, j + 1) - src(i, j - 1))
+                        + (src(i + 1, j + 1) - src(i + 1, j - 1));
                 result(i, j) = Limit::GrayByte(Math::Abs(dx) + Math::Abs(dy));
             }
         }
@@ -105,30 +105,17 @@ void ImgProcess::DownSampling(const GrayBMP & src, GrayBMP& dst, int scale)
 
 void ImgProcess::Scaling(const GrayBMP& src, GrayBMP& dst)
 {
-    const int FACTOR = 2048;
-    const int BITS = 22;
     int width = dst.getWidth(), height = dst.getHeight();
     float fw = float(src.getWidth()) / width;
     float fh = float(src.getHeight()) / height;
     float x, y;
-    int x0, y0, x1, y1;
-    int u, v, u_1, v_1;
-    int result;
     for (int j = 0; j < height; ++j)
     {
         for (int i = 0; i < width; ++i)
         {
             x = i * fw;
             y = j * fh;
-            x0 = (int) x;
-            y0 = (int) y;
-            u = (x - x0) * FACTOR;
-            v = (y - y0) * FACTOR;
-            u_1 = FACTOR - u;
-            v_1 = FACTOR - v;
-            result = (src(x0, y0) * u_1 + src(x0 + 1, y0) * u) * v_1
-                    + (src(x0, y0 + 1) * u_1 + src(x0 + 1, y0 + 1) * u) * v;
-            dst(i, j) = result >> BITS;
+            dst(i, j) = Interpolation(src, x, y);
         }
     }
 }

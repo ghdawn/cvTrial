@@ -104,6 +104,8 @@ void Jacobi::jacobi()
     double phi, m;
     int i, j;
     JACOBI_MATRIX tempVectors(dimen), vectors(dimen), cmat(dimen);
+    vectors[0].resize(dimen);
+    vectors[1].resize(dimen);
     for (JACOBI_vint x = 0; x < dimen; x++)
     {
         tempVectors[x].resize(dimen);
