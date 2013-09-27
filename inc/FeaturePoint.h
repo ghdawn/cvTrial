@@ -11,13 +11,16 @@
 class FeaturePoint
 {
     public:
-        int x,y;
-        int key;
-        bool operator<(FeaturePoint b)
+        int x, y;
+        float key;
+        inline bool operator<(const FeaturePoint &b)const
         {
-            return key<b.key;
+            return key < b.key;
+        }
+        inline bool operator>(const FeaturePoint& b)const
+        {
+            return key > b.key;
         }
 };
-
 
 #endif /* FEATUREPOINT_H_ */

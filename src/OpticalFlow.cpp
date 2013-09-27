@@ -14,6 +14,7 @@
 #include "Vector.h"
 #include "Jacobi.h"
 #include "OpticalFlow.h"
+#include "FeaturePoint.h"
 
 void OpticalFlow::Init(const GrayBMP& It1, const GrayBMP& It2)
 {
@@ -52,6 +53,79 @@ int OpticalFlow::Ixy(int L, int x, int y)
     {
         ixy[L](x, y) = dx[L](x, y) * dy[L](x, y);
         return ixy[L](x, y);
+    }
+}
+
+float OpticalFlow::_minEigenvalue(float gxx, float gxy, float gyy)
+{
+    return (float) ((gxx + gyy - sqrt((gxx - gyy) * (gxx - gyy) + 4 * gxy * gxy))
+            * 0.5f);
+}
+
+void OpticalFlow::SelectGoodFeature(const Rect& rect,std::vector<FeaturePoint>& result)
+{
+    std::vector<FeaturePoint> featurelist(rect.getWidth() * rect.getHeight());
+    int upx = rect.getX() + rect.getWidth();
+    int upy = rect.getY() + rect.getHeight();
+    const int w = 5;
+    int k = 0;
+    for (int j = rect.getY(); j < upy; ++j)
+    {
+        for (int i = rect.getX(); i < upx; ++i)
+        {
+            int xx = 0, yy = 0, xy = 0;
+            for (int jj = j - w; jj <= j + w; ++jj)
+            {
+                for (int ii = i - w; ii <= i + w; ++ii)
+                {
+                    xx += Ixx(0, ii, jj);
+                    yy += Iyy(0, ii, jj);
+                    xy += Ixy(0, ii, jj);
+                }
+            }
+            featurelist[k].x = i;
+            featurelist[k].y = j;
+            featurelist[k].key = _minEigenvalue(xx, xy, yy);
+            ++k;
+        }
+    }
+    FeaturePoint max = *max_element(featurelist.begin(), featurelist.end());
+    max.key *= 0.05;
+    for (vector<FeaturePoint>::iterator i = featurelist.begin();
+            i < featurelist.end(); ++i)
+        if (i->key < max.key)
+            i->key = -1;
+    sort(featurelist.begin(), featurelist.end(), greater<FeaturePoint>());
+    FeaturePoint feat;
+    for (int i = 0; i < featurelist.size(); ++i)
+    {
+        //printf("%f ",featurelist[i].key);
+        if (featurelist[i].key > 0)
+        {
+            feat = featurelist[i];
+            k=0;
+            for (int j = i + 1; j < featurelist.size(); ++j)
+            {
+                if ((Math::Abs(featurelist[j].x - feat.x) <= 5)
+                        && (Math::Abs(featurelist[j].y - feat.y) <= 5))
+                {
+                    featurelist[j].key = -1;
+                    ++k;
+                }
+                if(k>=25)break;
+            }
+        }
+    }
+    k = 0;
+    for (int i = 0; i < featurelist.size(); ++i)
+    {
+        if (featurelist[i].key > 0)
+        {
+            result[k] = featurelist[i];
+            ++k;
+        }
+        if (k >= result.size())
+            break;
     }
 }
 
@@ -208,18 +282,19 @@ Rect OpticalFlow::Compute(const Rect& rect)
     Point *V = new Point[count];
     float *error = new float[count];
     int k = 0;
-    for (int j = y; j < upy; j += 2)
-    {
-        for (int i = x; i < upx; i += 2)
+    vector<FeaturePoint> feat(100);
+    SelectGoodFeature(rect,feat);
+//    for (int j = y; j < upy; j += 2)
+//        for (int i = x; i < upx; i += 2)
+    for(vector<FeaturePoint>::iterator i=feat.begin();i<feat.end();++i)
         {
-            u.x = i;
-            u.y = j;
+            u.x = i->x;
+            u.y = i->y;
             Compute(u, v, true);
             U[k] = u;
             V[k] = v;
             ++k;
         }
-    }
 
     u.x = u.y = 0;
     v.x = v.y = 0;
@@ -253,7 +328,7 @@ Rect OpticalFlow::Compute(const Rect& rect)
     }
     u.x = u.y = 0;
     v.x = v.y = 0;
-    k = (3*k) >> 2;
+    k = k>>1;
     for (int i = 0; i < k; ++i)
     {
         u = u + U[i];

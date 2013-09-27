@@ -7,10 +7,13 @@
 
 #ifndef OPTICALFLOW_H_
 #define OPTICALFLOW_H_
-
+#include <vector>
 class GrayBMP;
 class Point;
 class Rect;
+class FeaturePoint;
+
+using std::vector;
 /*
  *
  */
@@ -23,8 +26,10 @@ class OpticalFlow
         int level;
         OpticalFlow();
         OpticalFlow(int Level);
+        void SelectGoodFeature(const Rect& rect,std::vector<FeaturePoint>& result);
     private:
         void GeneratePyramidal(const GrayBMP& It1,const GrayBMP& It2);
+        float _minEigenvalue(float gxx, float gxy, float gyy);
         int Ixx(int L,int x,int y);
         int Ixy(int L,int x,int y);
         int Iyy(int L,int x,int y);

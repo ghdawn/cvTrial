@@ -13,6 +13,7 @@
 #include "inc/Jacobi.h"
 #include "inc/OpticalFlow.h"
 #include "stdlib.h"
+#include "inc/FeaturePoint.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -162,6 +163,7 @@ void testLKPy2()
     int t[] =
     { 1, 4, 6, 4, 1 };
     Filter::ConvApplyto(gray1, t, 5);
+    Filter::ConvApplyto(gray2, t, 5);
     OpticalFlow flow;
 
     Point u, v, final;
@@ -174,21 +176,27 @@ void testLKPy2()
     int upy = y + rect.getHeight();
     final.x = final.y = 0;
     flow.Init(gray1, gray2);
-    for (int j = y; j < upy; j += 15)
+    vector<FeaturePoint> feat(50);
+    flow.SelectGoodFeature(rect, feat);
+    Vector<float> V(2);
+//    for (int j = y; j < upy; j += 15)
+//        for (int i = x; i < upx; i += 15)
+    for (vector<FeaturePoint>::iterator i = feat.begin(); i < feat.end(); ++i)
     {
-        for (int i = x; i < upx; i += 15)
-        {
-            u.x = i;
-            u.y = j;
-            flow.Compute(u, v, true);
+        u.x = i->x;
+        u.y = i->y;
+        flow.Compute(u, v, true);
 //            v = v - u;
 //            printf("(%d,%d)  ", v.x, v.y);
 //            final = final + v;
 //            draw::LineOffset(gray1, i, j, v.x, v.y, 255);
 //            draw::Cross(gray1,i,j,2,255);
-            draw::Cross(gray1, i, j, 1, 255);
-            draw::Cross(gray2, v.x, v.y, 1,255);
-        }
+        flow.Compute(v,final,false);
+        V[0]=final.x-u.x;
+        V[1]=final.y-u.y;
+        if(V.norm1()>5) continue;
+        draw::Cross(gray1, u.x, u.y, 2, 255);
+        draw::Cross(gray2, v.x, v.y, 2, 255);
     }
     ImgIO::WriteToFile(gray1, "ofpy1.bmp");
     ImgIO::WriteToFile(gray2, "ofpy2.bmp");
@@ -232,20 +240,20 @@ void testLKPy()
         int upy = y + rect.getHeight();
         final.x = final.y = 0;
         flow.Init(gray1, gray2);
-        for (int j = y; j < upy; j += 8)
-        {
-            for (int i = x; i < upx; i += 8)
-            {
-                u.x = i;
-                u.y = j;
-                flow.Compute(u, v, true);
-//                draw::LineOffset(gray1, i, j, v.x, v.y, 255);
-                draw::Cross(gray1, i, j, 2, 255);
-                draw::Cross(gray2, v.x, v.y, 2,255);
-            }
-        }
-        rect.setPosition(rect.getX() + final.x / count,
-                rect.getY() + final.y / count);
+//        for (int j = y; j < upy; j += 8)
+//        {
+//            for (int i = x; i < upx; i += 8)
+//            {
+//                u.x = i;
+//                u.y = j;
+//                flow.Compute(u, v, true);
+////                draw::LineOffset(gray1, i, j, v.x, v.y, 255);
+//                draw::Cross(gray1, i, j, 2, 255);
+//                draw::Cross(gray2, v.x, v.y, 2,255);
+//            }
+//        }
+//        rect.setPosition(rect.getX() + final.x / count,
+//                rect.getY() + final.y / count);
         rect = flow.Compute(rect);
         printf("\nNo.%d\n%d %d\n", k, rect.getX(), rect.getY());
 
@@ -391,8 +399,8 @@ int main()
 //    testDiff();
 //    testScaling();
 //    testOpticalFlow();
-    testLKPy2();
-//    testLKPy();
+//    testLKPy2();
+    testLKPy();
 //    testEigen();
 //    testDetect();
     // testVector();
